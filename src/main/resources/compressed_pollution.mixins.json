@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "package": "io.github.real_septicake.compressed_pollution.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "refmap": "compressed_pollution.mixins.refmap.json",
+  "client": [
+  ],
+  "mixins": [
+    "BackpackDestructionMixin",
+    "BlockItemDestructionMixin",
+    "BundleItemDestructionMixin",
+    "CellItemDestructionMixin",
+    "CellVoidingMixin",
+    "EntityDestructionMixin",
+    "FallingBlockFluidDestructionMixin",
+    "FlareFluidDestructionMixin",
+    "ItemDestructionMixin",
+    "PackageItemDestructionMixin",
+    "PistonFluidDestructionMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
