@@ -38,6 +38,9 @@ public abstract class PollutionEvent<T> extends GenericEvent<T> {
         return pollution;
     }
 
+    /**
+     * @return The position of the object causing the pollution, or null if no appropriate position exists
+     */
     public @Nullable BlockPos getSourcePos() {
         return sourcePos;
     }

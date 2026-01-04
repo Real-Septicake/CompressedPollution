@@ -2,7 +2,6 @@ package io.github.real_septicake.compressed_pollution;
 
 import io.github.real_septicake.compressed_pollution.api.PollutionRegistryResolver;
 import io.github.real_septicake.compressed_pollution.caps.ILevelPollution;
-import io.github.real_septicake.compressed_pollution.caps.LevelPollution;
 import io.github.real_septicake.compressed_pollution.caps.LevelPollutionAttacher;
 import io.github.real_septicake.compressed_pollution.events.ClassedPollutionEvent;
 import io.github.real_septicake.compressed_pollution.events.PollutionEventFactory;
@@ -185,6 +184,7 @@ public class CompressedPollution
      * @param level The level to apply the pollution to
      * @param obj The object causing the pollution
      * @param clazz The class to post the PollutionEvent to
+     * @param sourcePos The position of the object causing the pollution, or null if no appropriate position exists
      * @param <T> The class to post the PollutionEvent to
      */
     public static <T> void handlePollution(@Nonnull Pollution pollution, @Nonnull ServerLevel level, T obj, Class<T> clazz, BlockPos sourcePos) {
@@ -192,13 +192,14 @@ public class CompressedPollution
     }
 
     /**
-     * Method for applying {@link Pollution} to <code>level</code>'s {@link LevelPollution}, fires the
+     * Method for applying a {@link Pollution} to <code>level</code>'s {@link LevelPollution}, fires the
      * event created by <code>factory</code>
      * @param pollution The pollution to apply. <b>This can be modified by event handlers.</b>
      *                  Use {@link Pollution#copy()} if it should not directly modify the instance passed in
      * @param level The level to apply the pollution to
      * @param obj The object causing the pollution
      * @param clazz The class to post the PollutionEvent to
+     * @param sourcePos The position of the object causing the pollution, or null if no appropriate position exists
      * @param factory The constructor for the event to fire
      * @param <T> The class to post the PollutionEvent to
      */

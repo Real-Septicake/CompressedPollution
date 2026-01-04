@@ -112,9 +112,9 @@ public abstract class PollutionRegistryResolver<T> {
      * for its class
      * @param level The level the pollution will be applied to
      * @param obj The object causing the pollution
-     * @param <R> A superclass of {@link T}
+     * @param sourcePos The position of the object causing the pollution, or null if no appropriate position exists
      */
-    public final <R extends T> void fireEvent(ServerLevel level, R obj, @Nullable BlockPos sourcePos) {
+    public final void fireEvent(ServerLevel level, T obj, @Nullable BlockPos sourcePos) {
         CompressedPollution.handlePollution(
                 resolve(level.registryAccess(), obj, Optional.of(level.getProfiler())),
                 level, obj, clazz, sourcePos
@@ -122,14 +122,14 @@ public abstract class PollutionRegistryResolver<T> {
     }
 
     /**
-     * Similar to {@link PollutionRegistryResolver#fireEvent(ServerLevel, Object)}, but applies <code>trans</code> before
+     * Similar to {@link PollutionRegistryResolver#fireEvent(ServerLevel, Object, BlockPos)}, but applies <code>trans</code> before
      * firing the event
      * @param level The level the pollution will be applied to
      * @param obj The object causing the pollution
+     * @param sourcePos The position of the object causing the pollution, or null if no appropriate position exists
      * @param trans The {@link Pollution} transformer to be applied
-     * @param <R> A superclass of {@link T}
      */
-    public final <R extends T> void fireEvent(ServerLevel level, R obj, @Nullable BlockPos sourcePos, Consumer<Pollution> trans) {
+    public final void fireEvent(ServerLevel level, T obj, @Nullable BlockPos sourcePos, Consumer<Pollution> trans) {
         Pollution p = resolve(level.registryAccess(), obj, Optional.of(level.getProfiler()));
         trans.accept(p);
         CompressedPollution.handlePollution(

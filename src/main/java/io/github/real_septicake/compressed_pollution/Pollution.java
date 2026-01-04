@@ -78,6 +78,9 @@ public record Pollution(Map<String, Long> values) {
         this.values = values;
     }
 
+    /**
+     * @return Whether there are any pollution values present
+     */
     public boolean isEmpty() {
         return values.isEmpty();
     }

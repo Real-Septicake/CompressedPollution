@@ -1,9 +1,7 @@
-package io.github.real_septicake.compressed_pollution.caps;
+package io.github.real_septicake.compressed_pollution;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.real_septicake.compressed_pollution.CompressedPollution;
-import io.github.real_septicake.compressed_pollution.Pollution;
 import net.minecraft.server.level.ServerLevel;
 
 import javax.annotation.Nonnull;
