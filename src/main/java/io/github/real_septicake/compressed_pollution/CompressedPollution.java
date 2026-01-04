@@ -1,20 +1,18 @@
 package io.github.real_septicake.compressed_pollution;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import io.github.real_septicake.compressed_pollution.api.PollutionRegistryResolver;
 import io.github.real_septicake.compressed_pollution.caps.ILevelPollution;
 import io.github.real_septicake.compressed_pollution.caps.LevelPollution;
 import io.github.real_septicake.compressed_pollution.caps.LevelPollutionAttacher;
+import io.github.real_septicake.compressed_pollution.events.ClassedPollutionEvent;
+import io.github.real_septicake.compressed_pollution.events.PollutionEventFactory;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -35,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.time.Duration;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(CompressedPollution.MODID)
@@ -53,7 +50,6 @@ public class CompressedPollution
 
     private static final Logger LOGGER = LoggerFactory.getLogger("CompressedPollution");
 
-    // Define mod id in a common place for everything to reference
     /**
      * Mod ID
      */
@@ -64,9 +60,7 @@ public class CompressedPollution
     /** Registry key for Fluid pollution values */
     public static final ResourceKey<Registry<PollutionEntry<Fluid>>> POLLUTION_FLUID_REGISTRY_KEY = ResourceKey.createRegistryKey(id("pollutions/fluid"));
 
-    /**
-     * The resolver for {@link Item}s
-     */
+    /** The resolver for {@link Item}s */
     public static final PollutionRegistryResolver<Item> ITEM_RESOLVER = new PollutionRegistryResolver<>(
             5L,
             Item.class,
@@ -83,9 +77,7 @@ public class CompressedPollution
         }
     };
 
-    /**
-     * The resolver for {@link Fluid}s
-     */
+    /** The resolver for {@link Fluid}s */
     public static final PollutionRegistryResolver<Fluid> FLUID_RESOLVER = new PollutionRegistryResolver<>(
             5L,
             Fluid.class,
@@ -125,7 +117,7 @@ public class CompressedPollution
                     new LevelPollutionAttacher.LevelPollutionProvider()
             );
         });
-        MinecraftForge.EVENT_BUS.addGenericListener(Fluid.class, (PollutionEvent<Fluid> evt) -> {
+        MinecraftForge.EVENT_BUS.addGenericListener(Fluid.class, (ClassedPollutionEvent<Fluid> evt) -> {
             System.out.println(evt.getObj().getFluidType());
             if(evt.getObj().isSame(Fluids.LAVA))
                 evt.setCanceled(true);
@@ -186,7 +178,7 @@ public class CompressedPollution
 
     /**
      * Method for applying a {@link Pollution} to <code>level</code>'s {@link LevelPollution}, fires the
-     * {@link PollutionEvent} event
+     * {@link ClassedPollutionEvent} event
      * @param pollution The pollution to apply. <b>This can be modified by event handlers.</b>
      *                  Use {@link Pollution#copy()} if it should not directly modify the instance passed in
      * @param level The level to apply the pollution to
@@ -195,10 +187,25 @@ public class CompressedPollution
      * @param <T> The class to post the PollutionEvent to
      */
     public static <T> void handlePollution(@Nonnull Pollution pollution, @Nonnull ServerLevel level, T obj, Class<T> clazz) {
+        handlePollution(pollution, level, obj, clazz, ClassedPollutionEvent::new);
+    }
+
+    /**
+     * Method for applying {@link Pollution} to <code>level</code>'s {@link LevelPollution}, fires the
+     * event created by <code>factory</code>
+     * @param pollution The pollution to apply. <b>This can be modified by event handlers.</b>
+     *                  Use {@link Pollution#copy()} if it should not directly modify the instance passed in
+     * @param level The level to apply the pollution to
+     * @param obj The object causing the pollution
+     * @param clazz The class to post the PollutionEvent to
+     * @param factory The constructor for the event to fire
+     * @param <T> The class to post the PollutionEvent to
+     */
+    public static <T> void handlePollution(@Nonnull Pollution pollution, @Nonnull ServerLevel level, T obj, Class<T> clazz, PollutionEventFactory<T> factory) {
         level.getProfiler().push("PollutionApplication");
-        if(!MinecraftForge.EVENT_BUS.post(new PollutionEvent<>(clazz, pollution, obj, level)) && !pollution.isEmpty()) {
-                LOGGER.debug("Pollution Applied {}", pollution);
-                LevelPollution.getFromLevel(level).apply(pollution);
+        if(!MinecraftForge.EVENT_BUS.post(factory.create(clazz, pollution, obj, level)) && !pollution.isEmpty()) {
+            LOGGER.debug("Pollution applied: {}", pollution);
+            LevelPollution.getFromLevel(level).apply(pollution);
         }
         level.getProfiler().pop();
     }
