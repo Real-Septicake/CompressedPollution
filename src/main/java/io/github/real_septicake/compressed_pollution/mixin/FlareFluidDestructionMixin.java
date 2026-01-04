@@ -26,12 +26,9 @@ public abstract class FlareFluidDestructionMixin extends IPTileEntityBase {
     @Inject(method = "tickServer", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fluids/capability/templates/FluidTank;drain(ILnet/minecraftforge/fluids/capability/IFluidHandler$FluidAction;)Lnet/minecraftforge/fluids/FluidStack;", ordinal = 1, shift = At.Shift.AFTER), remap = false)
     private void pollutionTime(CallbackInfo ci, @Local(name = "fs") FluidStack fs) {
         if(this.level != null && !this.level.isClientSide)
-            CompressedPollution.FLUID_RESOLVER.fireEvent((ServerLevel) this.level, fs.getFluid(), p -> p.multiply(fs.getAmount()));
-//            CompressedPollution.handlePollution(
-//                    CompressedPollution.pollutionForFluid(this.level.registryAccess(), fs.getFluid(), this.level.getProfiler()).multiply(fs.getAmount()),
-//                    (ServerLevel) this.level,
-//                    fs.getFluid(),
-//                    Fluid.class
-//            );
+            CompressedPollution.FLUID_RESOLVER.fireEvent(
+                    (ServerLevel) this.level, fs.getFluid(),
+                    this.worldPosition, p -> p.multiply(fs.getAmount())
+            );
     }
 }

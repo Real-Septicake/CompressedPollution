@@ -6,6 +6,7 @@ import io.github.real_septicake.compressed_pollution.CompressedPollution;
 import io.github.real_septicake.compressed_pollution.Pollution;
 import io.github.real_septicake.compressed_pollution.PollutionEntry;
 import io.github.real_septicake.compressed_pollution.events.ClassedPollutionEvent;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -15,6 +16,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.profiling.ProfilerFiller;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -112,10 +114,10 @@ public abstract class PollutionRegistryResolver<T> {
      * @param obj The object causing the pollution
      * @param <R> A superclass of {@link T}
      */
-    public final <R extends T> void fireEvent(ServerLevel level, R obj) {
+    public final <R extends T> void fireEvent(ServerLevel level, R obj, @Nullable BlockPos sourcePos) {
         CompressedPollution.handlePollution(
                 resolve(level.registryAccess(), obj, Optional.of(level.getProfiler())),
-                level, obj, clazz
+                level, obj, clazz, sourcePos
         );
     }
 
@@ -127,11 +129,11 @@ public abstract class PollutionRegistryResolver<T> {
      * @param trans The {@link Pollution} transformer to be applied
      * @param <R> A superclass of {@link T}
      */
-    public final <R extends T> void fireEvent(ServerLevel level, R obj, Consumer<Pollution> trans) {
+    public final <R extends T> void fireEvent(ServerLevel level, R obj, @Nullable BlockPos sourcePos, Consumer<Pollution> trans) {
         Pollution p = resolve(level.registryAccess(), obj, Optional.of(level.getProfiler()));
         trans.accept(p);
         CompressedPollution.handlePollution(
-                p, level, obj, clazz
+                p, level, obj, clazz, sourcePos
         );
     }
 }

@@ -6,6 +6,7 @@ import io.github.real_septicake.compressed_pollution.caps.LevelPollution;
 import io.github.real_septicake.compressed_pollution.caps.LevelPollutionAttacher;
 import io.github.real_septicake.compressed_pollution.events.ClassedPollutionEvent;
 import io.github.real_septicake.compressed_pollution.events.PollutionEventFactory;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.data.DataGenerator;
@@ -186,8 +187,8 @@ public class CompressedPollution
      * @param clazz The class to post the PollutionEvent to
      * @param <T> The class to post the PollutionEvent to
      */
-    public static <T> void handlePollution(@Nonnull Pollution pollution, @Nonnull ServerLevel level, T obj, Class<T> clazz) {
-        handlePollution(pollution, level, obj, clazz, ClassedPollutionEvent::new);
+    public static <T> void handlePollution(@Nonnull Pollution pollution, @Nonnull ServerLevel level, T obj, Class<T> clazz, BlockPos sourcePos) {
+        handlePollution(pollution, level, obj, clazz, sourcePos, ClassedPollutionEvent::new);
     }
 
     /**
@@ -201,9 +202,9 @@ public class CompressedPollution
      * @param factory The constructor for the event to fire
      * @param <T> The class to post the PollutionEvent to
      */
-    public static <T> void handlePollution(@Nonnull Pollution pollution, @Nonnull ServerLevel level, T obj, Class<T> clazz, PollutionEventFactory<T> factory) {
+    public static <T> void handlePollution(@Nonnull Pollution pollution, @Nonnull ServerLevel level, T obj, Class<T> clazz, BlockPos sourcePos, PollutionEventFactory<T> factory) {
         level.getProfiler().push("PollutionApplication");
-        if(!MinecraftForge.EVENT_BUS.post(factory.create(clazz, pollution, obj, level)) && !pollution.isEmpty()) {
+        if(!MinecraftForge.EVENT_BUS.post(factory.create(clazz, pollution, obj, level, sourcePos)) && !pollution.isEmpty()) {
             LOGGER.debug("Pollution applied: {}", pollution);
             LevelPollution.getFromLevel(level).apply(pollution);
         }

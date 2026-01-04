@@ -1,6 +1,7 @@
 package io.github.real_septicake.compressed_pollution.events;
 
 import io.github.real_septicake.compressed_pollution.Pollution;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 
 /**
@@ -9,8 +10,8 @@ import net.minecraft.server.level.ServerLevel;
  */
 public class NonClassedPollutionEvent<T extends NonClassedType> extends PollutionEvent<T> {
     private final T type;
-    public NonClassedPollutionEvent(Class<T> clazz, Pollution pollution, T type, ServerLevel level) {
-        super(clazz, level, pollution);
+    public NonClassedPollutionEvent(Class<T> clazz, Pollution pollution, T type, ServerLevel level, BlockPos sourcePos) {
+        super(clazz, level, pollution, sourcePos);
         this.type = type;
     }
 

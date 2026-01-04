@@ -16,13 +16,10 @@ public class EntityDestructionMixin {
     private void polluteOnVoid(CallbackInfo ci) {
         Entity self = (Entity) (Object) this;
         if(self instanceof ItemEntity ie && !ie.level().isClientSide) {
-            CompressedPollution.ITEM_RESOLVER.fireEvent((ServerLevel) ie.level(), ie.getItem().getItem());
-//            CompressedPollution.handlePollution(
-//                    CompressedPollution.pollutionForItem(ie.level().registryAccess(), ie.getItem(), ie.level().getProfiler()),
-//                    (ServerLevel) ie.level(),
-//                    ie.getItem().getItem(),
-//                    Item.class
-//            );
+            CompressedPollution.ITEM_RESOLVER.fireEvent(
+                    (ServerLevel) ie.level(), ie.getItem().getItem(),
+                    ie.blockPosition(), p -> p.multiply(ie.getItem().getCount())
+            );
         }
     }
 }

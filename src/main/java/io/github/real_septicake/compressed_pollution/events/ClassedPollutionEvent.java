@@ -1,6 +1,7 @@
 package io.github.real_septicake.compressed_pollution.events;
 
 import io.github.real_septicake.compressed_pollution.Pollution;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.GenericEvent;
@@ -12,8 +13,8 @@ import net.minecraftforge.eventbus.api.GenericEvent;
 @Cancelable
 public class ClassedPollutionEvent<T> extends PollutionEvent<T> {
     private final T obj;
-    public ClassedPollutionEvent(Class<T> type, Pollution pollution, T obj, ServerLevel level) {
-        super(type, level, pollution);
+    public ClassedPollutionEvent(Class<T> type, Pollution pollution, T obj, ServerLevel level, BlockPos sourcePos) {
+        super(type, level, pollution, sourcePos);
         this.obj = obj;
     }
 

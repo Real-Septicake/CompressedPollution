@@ -47,25 +47,19 @@ public class CellItemDestructionMixin extends AEBaseItem {
                         Item itemType = ForgeRegistries.ITEMS.getValue(loc);
                         if (itemType == null)
                             continue;
-                        CompressedPollution.ITEM_RESOLVER.fireEvent((ServerLevel) item.level(), itemType, p -> p.multiply(amt));
-//                        CompressedPollution.handlePollution(
-//                                CompressedPollution.pollutionForItem(item.level().registryAccess(), new ItemStack(itemType), item.level().getProfiler()).multiply(amt),
-//                                (ServerLevel) item.level(),
-//                                itemType,
-//                                Item.class
-//                        );
+                        CompressedPollution.ITEM_RESOLVER.fireEvent(
+                                (ServerLevel) item.level(), itemType,
+                                item.blockPosition(), p -> p.multiply(amt)
+                        );
                     }
                     case "ae2:f" -> {
                         Fluid fluidType = ForgeRegistries.FLUIDS.getValue(loc);
                         if (fluidType == null)
                             continue;
-                        CompressedPollution.FLUID_RESOLVER.fireEvent((ServerLevel) item.level(), fluidType, p -> p.multiply(amt));
-//                        CompressedPollution.handlePollution(
-//                                CompressedPollution.pollutionForFluid(item.level().registryAccess(), fluidType, item.level().getProfiler()).multiply(amt),
-//                                (ServerLevel) item.level(),
-//                                fluidType,
-//                                Fluid.class
-//                        );
+                        CompressedPollution.FLUID_RESOLVER.fireEvent(
+                                (ServerLevel) item.level(), fluidType,
+                                item.blockPosition(), p -> p.multiply(amt)
+                        );
                     }
                     default -> {}
                 }

@@ -18,13 +18,10 @@ public class BlockItemDestructionMixin {
     @Inject(method = "onDestroyed", at = @At("HEAD"))
     private void pollutionTime(ItemEntity item, CallbackInfo ci) {
         if(!item.level().isClientSide) {
-            CompressedPollution.ITEM_RESOLVER.fireEvent((ServerLevel) item.level(), item.getItem().getItem(), p -> p.multiply(item.getItem().getCount()));
-//            CompressedPollution.handlePollution(
-//                    CompressedPollution.pollutionForItem(item.level().registryAccess(), item.getItem(), item.level().getProfiler()).multiply(item.getItem().getCount()),
-//                    (ServerLevel) item.level(),
-//                    item.getItem().getItem(),
-//                    Item.class
-//            );
+            CompressedPollution.ITEM_RESOLVER.fireEvent(
+                    (ServerLevel) item.level(), item.getItem().getItem(),
+                    item.blockPosition(), p -> p.multiply(item.getItem().getCount())
+            );
         }
     }
 
@@ -33,13 +30,10 @@ public class BlockItemDestructionMixin {
         if(!ctx.getLevel().isClientSide) {
             FluidState fs = ctx.getLevel().getFluidState(ctx.getClickedPos());
             if (fs.isSource()) {
-                CompressedPollution.FLUID_RESOLVER.fireEvent((ServerLevel) ctx.getLevel(), fs.getType(), p -> p.multiply(1_000));
-//                CompressedPollution.handlePollution(
-//                        CompressedPollution.pollutionForFluid(ctx.getLevel().registryAccess(), fs.getType(), ctx.getLevel().getProfiler()).multiply(1_000),
-//                        (ServerLevel) ctx.getLevel(),
-//                        fs.getType(),
-//                        Fluid.class
-//                );
+                CompressedPollution.FLUID_RESOLVER.fireEvent(
+                        (ServerLevel) ctx.getLevel(), fs.getType(),
+                        ctx.getClickedPos(), p -> p.multiply(1_000)
+                );
             }
         }
     }
