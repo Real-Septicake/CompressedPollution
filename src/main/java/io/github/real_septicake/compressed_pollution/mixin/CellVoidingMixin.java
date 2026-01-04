@@ -2,12 +2,10 @@ package io.github.real_septicake.compressed_pollution.mixin;
 
 import appeng.api.config.Actionable;
 import appeng.api.networking.IGridNode;
-import appeng.api.networking.security.IActionHost;
 import appeng.api.networking.security.IActionSource;
 import appeng.api.stacks.AEFluidKey;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
-import appeng.api.stacks.AEKeyType;
 import appeng.me.cells.BasicCellInventory;
 import com.llamalad7.mixinextras.sugar.Local;
 import io.github.real_septicake.compressed_pollution.CompressedPollution;
@@ -47,20 +45,22 @@ public abstract class CellVoidingMixin {
             }
             if(level != null) {
                 if (what instanceof AEItemKey) {
-                    CompressedPollution.handlePollution(
-                            CompressedPollution.pollutionForItem(level.registryAccess(), ((AEItemKey) what).toStack(), level.getProfiler()).multiply(count),
-                            level,
-                            ((AEItemKey) what).toStack().getItem(),
-                            Item.class
-                    );
+                    CompressedPollution.ITEM_RESOLVER.fireEvent(level, ((AEItemKey) what).getItem(), p -> p.multiply(count));
+//                    CompressedPollution.handlePollution(
+//                            CompressedPollution.pollutionForItem(level.registryAccess(), ((AEItemKey) what).toStack(), level.getProfiler()).multiply(count),
+//                            level,
+//                            ((AEItemKey) what).toStack().getItem(),
+//                            Item.class
+//                    );
                 }
                 if(what instanceof AEFluidKey) {
-                    CompressedPollution.handlePollution(
-                            CompressedPollution.pollutionForFluid(level.registryAccess(), ((AEFluidKey) what).getFluid(), level.getProfiler()).multiply(count),
-                            level,
-                            ((AEFluidKey) what).getFluid(),
-                            Fluid.class
-                    );
+                    CompressedPollution.FLUID_RESOLVER.fireEvent(level, ((AEFluidKey) what).getFluid(), p -> p.multiply(count));
+//                    CompressedPollution.handlePollution(
+//                            CompressedPollution.pollutionForFluid(level.registryAccess(), ((AEFluidKey) what).getFluid(), level.getProfiler()).multiply(count),
+//                            level,
+//                            ((AEFluidKey) what).getFluid(),
+//                            Fluid.class
+//                    );
                 }
             }
         }

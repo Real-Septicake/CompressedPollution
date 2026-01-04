@@ -2,6 +2,7 @@ package io.github.real_septicake.compressed_pollution;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import io.github.real_septicake.compressed_pollution.api.PollutionRegistryResolver;
 import io.github.real_septicake.compressed_pollution.caps.ILevelPollution;
 import io.github.real_septicake.compressed_pollution.caps.LevelPollution;
 import io.github.real_septicake.compressed_pollution.caps.LevelPollutionAttacher;
@@ -12,6 +13,7 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -61,6 +63,44 @@ public class CompressedPollution
     public static final ResourceKey<Registry<PollutionEntry<Item>>> POLLUTION_ITEM_REGISTRY_KEY = ResourceKey.createRegistryKey(id("pollutions/item"));
     /** Registry key for Fluid pollution values */
     public static final ResourceKey<Registry<PollutionEntry<Fluid>>> POLLUTION_FLUID_REGISTRY_KEY = ResourceKey.createRegistryKey(id("pollutions/fluid"));
+
+    /**
+     * The resolver for {@link Item}s
+     */
+    public static final PollutionRegistryResolver<Item> ITEM_RESOLVER = new PollutionRegistryResolver<>(
+            5L,
+            Item.class,
+            POLLUTION_ITEM_REGISTRY_KEY
+    ) {
+        @Override
+        public ResourceLocation toRL(Item obj) {
+            return ForgeRegistries.ITEMS.getKey(obj.asItem());
+        }
+
+        @Override
+        public boolean isTag(Item obj, TagKey<Item> tag) {
+            return new ItemStack(obj).is(tag);
+        }
+    };
+
+    /**
+     * The resolver for {@link Fluid}s
+     */
+    public static final PollutionRegistryResolver<Fluid> FLUID_RESOLVER = new PollutionRegistryResolver<>(
+            5L,
+            Fluid.class,
+            POLLUTION_FLUID_REGISTRY_KEY
+    ) {
+        @Override
+        public ResourceLocation toRL(Fluid obj) {
+            return ForgeRegistries.FLUIDS.getKey(obj);
+        }
+
+        @Override
+        public boolean isTag(Fluid obj, TagKey<Fluid> tag) {
+            return obj.is(tag);
+        }
+    };
 
     /**
      * Creates a ResourceLocation with {@link CompressedPollution#MODID} as the namespace
@@ -144,106 +184,11 @@ public class CompressedPollution
         ));
     }
 
-    private static final Cache<ResourceLocation, Pollution> ITEM_CACHE = CacheBuilder.newBuilder().expireAfterAccess(Duration.ofMinutes(5)).build();
-
-    /**
-     * Gets the pollution values for the specified item
-     * @param access Registry access for the <b>server</b>, providing client registry access <i><b>will error.</b></i>
-     * @param item Item to get the pollution values of
-     * @return The pollution base values for the specified item
-     */
-    public static Pollution pollutionForItem(@Nonnull RegistryAccess access, @Nonnull ItemStack item, @Nonnull ProfilerFiller profiler) {
-        profiler.push("PollutionItem");
-        ResourceLocation loc = ForgeRegistries.ITEMS.getKey(item.getItem());
-        if(loc == null) {
-            profiler.pop();
-            return Pollution.PollutionBuilder.EMPTY;
-        }
-        Pollution cached = ITEM_CACHE.getIfPresent(loc);
-        if(cached != null) {
-            profiler.pop();
-            return cached.copy();
-        }
-        Pollution.PollutionBuilder builder = new Pollution.PollutionBuilder();
-        access.registryOrThrow(POLLUTION_ITEM_REGISTRY_KEY).entrySet().forEach(
-                entry -> {
-                    Long value = entry.getValue().values().getOrDefault(loc, null);
-                    if(value == null) {
-                        profiler.push("PollutionItemTag");
-                        PollutionEntry.PollutionTag<Item> tag = null;
-                        for(PollutionEntry.PollutionTag<Item> t : entry.getValue().tags()) {
-                            if(item.is(t.tag())) {
-                                tag = t;
-                                break;
-                            }
-                        }
-                        if(tag != null)
-                            value = tag.value();
-                        profiler.pop();
-                    }
-                    if(value == null)
-                        value = 0L;
-                    builder.put(entry.getKey().location().toString(), value);
-                }
-        );
-        profiler.pop();
-        Pollution created = builder.build();
-        ITEM_CACHE.put(loc, created);
-        return created.copy();
-    }
-
-    private static final Cache<ResourceLocation, Pollution> FLUID_CACHE = CacheBuilder.newBuilder().expireAfterAccess(Duration.ofMinutes(5)).build();
-
-    /**
-     * Gets the pollution values for the specified fluid
-     * @param access Registry access for the <b>server</b>, providing client registry access <i><b>will error.</b></i>
-     * @param fluid The fluid to get the pollution values of
-     * @return The pollution base values for the specified item
-     */
-    public static Pollution pollutionForFluid(@Nonnull RegistryAccess access, @Nonnull Fluid fluid, @Nonnull ProfilerFiller profiler) {
-        profiler.push("PollutionFluid");
-        ResourceLocation loc = ForgeRegistries.FLUIDS.getKey(fluid);
-        if(loc == null) {
-            profiler.pop();
-            return Pollution.PollutionBuilder.EMPTY.copy();
-        }
-        Pollution cached = FLUID_CACHE.getIfPresent(loc);
-        if(cached != null) {
-            profiler.pop();
-            return cached.copy();
-        }
-        Pollution.PollutionBuilder builder = new Pollution.PollutionBuilder();
-        access.registryOrThrow(POLLUTION_FLUID_REGISTRY_KEY).entrySet().forEach(
-                entry -> {
-                    Long value = entry.getValue().values().getOrDefault(loc, null);
-                    if(value == null) {
-                        profiler.push("PollutionFluidTag");
-                        PollutionEntry.PollutionTag<Fluid> tag = null;
-                        for(PollutionEntry.PollutionTag<Fluid> t : entry.getValue().tags()) {
-                            if(fluid.is(t.tag())) {
-                                tag = t;
-                                break;
-                            }
-                        }
-                        if(tag != null)
-                            value = tag.value();
-                        profiler.pop();
-                    }
-                    if(value == null)
-                        value = 0L;
-                    builder.put(entry.getKey().location().toString(), value);
-                }
-        );
-        profiler.pop();
-        Pollution created = builder.build();
-        FLUID_CACHE.put(loc, created);
-        return created.copy();
-    }
-
     /**
      * Method for applying a {@link Pollution} to <code>level</code>'s {@link LevelPollution}, fires the
      * {@link PollutionEvent} event
-     * @param pollution The pollution to apply
+     * @param pollution The pollution to apply. <b>This can be modified by event handlers.</b>
+     *                  Use {@link Pollution#copy()} if it should not directly modify the instance passed in
      * @param level The level to apply the pollution to
      * @param obj The object causing the pollution
      * @param clazz The class to post the PollutionEvent to
@@ -251,9 +196,9 @@ public class CompressedPollution
      */
     public static <T> void handlePollution(@Nonnull Pollution pollution, @Nonnull ServerLevel level, T obj, Class<T> clazz) {
         level.getProfiler().push("PollutionApplication");
-        if(!MinecraftForge.EVENT_BUS.post(new PollutionEvent<>(clazz, pollution, obj, level))) {
-            LOGGER.debug("Pollution created {}", pollution);
-            LevelPollution.getFromLevel(level).apply(pollution);
+        if(!MinecraftForge.EVENT_BUS.post(new PollutionEvent<>(clazz, pollution, obj, level)) && !pollution.isEmpty()) {
+                LOGGER.debug("Pollution Applied {}", pollution);
+                LevelPollution.getFromLevel(level).apply(pollution);
         }
         level.getProfiler().pop();
     }

@@ -24,12 +24,13 @@ public class PistonFluidDestructionMixin extends Block {
     @Inject(method = "moveBlocks", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;gameEvent(Lnet/minecraft/world/level/gameevent/GameEvent;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/gameevent/GameEvent$Context;)V", shift = At.Shift.AFTER))
     private void polluteOnFluidDestroy(Level level, BlockPos pos, Direction dir, boolean extending, CallbackInfoReturnable<Boolean> cir, @Local(name = "blockstate1") BlockState state) {
         if(state.getFluidState().isSource() && !level.isClientSide()) {
-            CompressedPollution.handlePollution(
-                    CompressedPollution.pollutionForFluid(level.registryAccess(), state.getFluidState().getType(), level.getProfiler()).multiply(1_000L),
-                    (ServerLevel) level,
-                    state.getFluidState().getType(),
-                    Fluid.class
-            );
+            CompressedPollution.FLUID_RESOLVER.fireEvent((ServerLevel) level, state.getFluidState().getType(), p -> p.multiply(1_000));
+//            CompressedPollution.handlePollution(
+//                    CompressedPollution.pollutionForFluid(level.registryAccess(), state.getFluidState().getType(), level.getProfiler()).multiply(1_000L),
+//                    (ServerLevel) level,
+//                    state.getFluidState().getType(),
+//                    Fluid.class
+//            );
         }
     }
 }

@@ -14,12 +14,13 @@ public class ItemDestructionMixin {
     @Inject(method = "onDestroyed", at = @At("HEAD"))
     private void pollutionTime(ItemEntity item, CallbackInfo ci) {
         if(!item.level().isClientSide) {
-            CompressedPollution.handlePollution(
-                    CompressedPollution.pollutionForItem(item.level().registryAccess(), item.getItem(), item.level().getProfiler()).multiply(item.getItem().getCount()),
-                    (ServerLevel) item.level(),
-                    item.getItem().getItem(),
-                    Item.class
-            );
+            CompressedPollution.ITEM_RESOLVER.fireEvent((ServerLevel) item.level(), item.getItem().getItem(), p -> p.multiply(item.getItem().getCount()));
+//            CompressedPollution.handlePollution(
+//                    CompressedPollution.pollutionForItem(item.level().registryAccess(), item.getItem(), item.level().getProfiler()).multiply(item.getItem().getCount()),
+//                    (ServerLevel) item.level(),
+//                    item.getItem().getItem(),
+//                    Item.class
+//            );
         }
     }
 }

@@ -28,12 +28,13 @@ public abstract class BackpackDestructionMixin extends ItemBase {
             for (int i = 0; i < handler.getSlots(); i++) {
                 ItemStack stack = handler.getStackInSlot(i);
                 if (!stack.isEmpty()) {
-                    CompressedPollution.handlePollution(
-                            CompressedPollution.pollutionForItem(item.level().registryAccess(), stack, item.level().getProfiler()).multiply(stack.getCount()),
-                            (ServerLevel) item.level(),
-                            stack.getItem(),
-                            Item.class
-                    );
+                    CompressedPollution.ITEM_RESOLVER.fireEvent((ServerLevel) item.level(), stack.getItem(), p -> p.multiply(stack.getCount()));
+//                    CompressedPollution.handlePollution(
+//                            CompressedPollution.pollutionForItem(item.level().registryAccess(), stack, item.level().getProfiler()).multiply(stack.getCount()),
+//                            (ServerLevel) item.level(),
+//                            stack.getItem(),
+//                            Item.class
+//                    );
                 }
             }
         }

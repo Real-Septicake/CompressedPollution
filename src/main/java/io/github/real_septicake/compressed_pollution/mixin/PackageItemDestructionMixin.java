@@ -25,12 +25,13 @@ public class PackageItemDestructionMixin extends BlockItem {
             if (container == null)
                 return;
             PackageContainer.TooltipStats stats = container.computeTooltipStats();
-            CompressedPollution.handlePollution(
-                    CompressedPollution.pollutionForItem(item.level().registryAccess(), stats.rootContents(), item.level().getProfiler()).multiply(stats.fullyMultipliedCount()),
-                    (ServerLevel) item.level(),
-                    item.getItem().getItem(),
-                    Item.class
-            );
+            CompressedPollution.ITEM_RESOLVER.fireEvent((ServerLevel) item.level(), stats.rootContents().getItem(), p -> p.multiply(stats.fullyMultipliedCount()));
+//            CompressedPollution.handlePollution(
+//                    CompressedPollution.pollutionForItem(item.level().registryAccess(), stats.rootContents(), item.level().getProfiler()).multiply(stats.fullyMultipliedCount()),
+//                    (ServerLevel) item.level(),
+//                    item.getItem().getItem(),
+//                    Item.class
+//            );
         }
     }
 }

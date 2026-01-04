@@ -78,6 +78,10 @@ public record Pollution(Map<String, Long> values) {
         this.values = values;
     }
 
+    public boolean isEmpty() {
+        return values.isEmpty();
+    }
+
     /**
      * Multiplies the values of this pollution instance by the value provided, the results of which are capped to
      * 9.2 quintillion to prevent possible overflows

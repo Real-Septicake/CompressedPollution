@@ -41,12 +41,13 @@ public abstract class FallingBlockFluidDestructionMixin extends Entity {
         if(!level().isClientSide) {
             FluidState fs = level().getFluidState(blockpos);
             if (fs.isSource()) {
-                CompressedPollution.handlePollution(
-                        CompressedPollution.pollutionForFluid(level().registryAccess(), fs.getType(), level().getProfiler()),
-                        (ServerLevel) level(),
-                        fs.getType(),
-                        Fluid.class
-                );
+                CompressedPollution.FLUID_RESOLVER.fireEvent((ServerLevel) level(), fs.getType(), p -> p.multiply(1_000));
+//                CompressedPollution.handlePollution(
+//                        CompressedPollution.pollutionForFluid(level().registryAccess(), fs.getType(), level().getProfiler()),
+//                        (ServerLevel) level(),
+//                        fs.getType(),
+//                        Fluid.class
+//                );
             }
         }
     }
