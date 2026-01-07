@@ -4,8 +4,9 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.github.real_septicake.compressed_pollution.CompressedPollution;
 import io.github.real_septicake.compressed_pollution.Pollution;
-import io.github.real_septicake.compressed_pollution.PollutionEntry;
+import io.github.real_septicake.compressed_pollution.TaggedPollutionEntry;
 import io.github.real_septicake.compressed_pollution.events.ClassedPollutionEvent;
+import io.github.real_septicake.compressed_pollution.events.PollutionEventFactory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -29,7 +30,7 @@ import java.util.function.Consumer;
 public abstract class PollutionRegistryResolver<T> {
     private final Cache<ResourceLocation, Pollution> CACHE;
     private final Class<T> clazz;
-    private final ResourceKey<Registry<PollutionEntry<T>>> registryKey;
+    private final ResourceKey<Registry<TaggedPollutionEntry<T>>> registryKey;
     private final String profilerEntry;
 
     /**
@@ -38,7 +39,7 @@ public abstract class PollutionRegistryResolver<T> {
      * @param tClass The class to fire the {@link ClassedPollutionEvent} for
      * @param rKey The registry to access for the pollution values. Must be visible server-side
      */
-    public PollutionRegistryResolver(long cacheTimer, Class<T> tClass, ResourceKey<Registry<PollutionEntry<T>>> rKey) {
+    public PollutionRegistryResolver(long cacheTimer, Class<T> tClass, ResourceKey<Registry<TaggedPollutionEntry<T>>> rKey) {
         CACHE = CacheBuilder.newBuilder().expireAfterAccess(Duration.ofMinutes(cacheTimer)).build();
         clazz = tClass;
         registryKey = rKey;
@@ -85,8 +86,8 @@ public abstract class PollutionRegistryResolver<T> {
                     Long value = entry.getValue().values().getOrDefault(loc, null);
                     if(value == null) {
                         profiler.ifPresent(p -> p.push(profilerEntry + "Tag"));
-                        PollutionEntry.PollutionTag<T> tag = null;
-                        for(PollutionEntry.PollutionTag<T> t : entry.getValue().tags()) {
+                        TaggedPollutionEntry.PollutionTag<T> tag = null;
+                        for(TaggedPollutionEntry.PollutionTag<T> t : entry.getValue().tags()) {
                             if(isTag(obj, t.tag())) {
                                 tag = t;
                                 break;

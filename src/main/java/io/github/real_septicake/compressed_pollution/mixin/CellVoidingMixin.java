@@ -9,15 +9,15 @@ import appeng.api.stacks.AEKey;
 import appeng.me.cells.BasicCellInventory;
 import com.llamalad7.mixinextras.sugar.Local;
 import io.github.real_septicake.compressed_pollution.CompressedPollution;
+import io.github.real_septicake.compressed_pollution.compat.ae2.AE2CompatHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
-import org.spongepowered.asm.mixin.Shadow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
@@ -29,6 +29,9 @@ public abstract class CellVoidingMixin {
     @Shadow(remap = false)
     @Final
     private boolean hasVoidUpgrade;
+
+    @Unique
+    private final static Logger compressedPollution$LOGGER = LoggerFactory.getLogger("CellItemVoiding");
 
     @Inject(method = "insert", at = @At(value = "RETURN"), slice = @Slice(from = @At(value = "INVOKE", target = "Lappeng/me/cells/BasicCellInventory;innerInsert(Lappeng/api/stacks/AEKey;JLappeng/api/config/Actionable;)J")), remap = false)
     private void polluteOnVoid(AEKey what, long amount, Actionable mode, IActionSource source, CallbackInfoReturnable<Long> cir, @Local(name = "inserted") long inserted) {
@@ -45,18 +48,11 @@ public abstract class CellVoidingMixin {
                     level = (ServerLevel) l;
             }
             if(level != null) {
-                if (what instanceof AEItemKey) {
-                    CompressedPollution.ITEM_RESOLVER.fireEvent(
-                            level, ((AEItemKey) what).getItem(),
-                            null, p -> p.multiply(count)
-                    );
-                }
-                if(what instanceof AEFluidKey) {
-                    CompressedPollution.FLUID_RESOLVER.fireEvent(
-                            level, ((AEFluidKey) what).getFluid(),
-                            null, p -> p.multiply(count)
-                    );
-                }
+                AE2CompatHandler.KeyHandler<AEKey> handler = AE2CompatHandler.instance().getHandler(what.getClass());
+                if(handler != null)
+                    handler.handle(what, count, level, null);
+                else
+                    compressedPollution$LOGGER.warn("Unhandled AE2 key type: {}", what.getClass().getSimpleName());
             }
         }
     }

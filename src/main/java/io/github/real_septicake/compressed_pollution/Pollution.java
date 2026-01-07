@@ -10,7 +10,7 @@ import java.util.Map;
  * An object representing amounts of pollutants
  * @param values Map from pollution to its value
  */
-public record Pollution(Map<String, Long> values) {
+public record Pollution(@Nonnull Map<String, Long> values) {
     /**
      * A convenience factory for a Pollution object
      */
@@ -74,10 +74,6 @@ public record Pollution(Map<String, Long> values) {
         }
     }
 
-    public Pollution(@Nonnull Map<String, Long> values) {
-        this.values = values;
-    }
-
     /**
      * @return Whether there are any pollution values present
      */
@@ -94,12 +90,7 @@ public record Pollution(Map<String, Long> values) {
      */
     public Pollution multiply(long val) {
         if (val != 0)
-            values.replaceAll((s, v) -> {
-                if (v < (CompressedPollution.POLLUTION_VALUE_CAP / val))
-                    return v * val;
-                else
-                    return CompressedPollution.POLLUTION_VALUE_CAP;
-            });
+            values.replaceAll((s, v) -> CompressedPollution.safeMult(v, val));
         else
             values.clear();
         return this;

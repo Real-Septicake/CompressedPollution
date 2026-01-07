@@ -17,7 +17,8 @@
     "FlareFluidDestructionMixin",
     "ItemDestructionMixin",
     "PackageItemDestructionMixin",
-    "PistonFluidDestructionMixin"
+    "PistonFluidDestructionMixin",
+    "ShulkerBoxMixin"
   ],
   "injectors": {
     "defaultRequire": 1

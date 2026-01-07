@@ -1,8 +1,12 @@
 package io.github.real_septicake.compressed_pollution;
 
+import appeng.api.stacks.AEFluidKey;
+import appeng.api.stacks.AEItemKey;
+import io.github.real_septicake.compressed_pollution.api.PollutionContainer;
 import io.github.real_septicake.compressed_pollution.api.PollutionRegistryResolver;
 import io.github.real_septicake.compressed_pollution.caps.ILevelPollution;
 import io.github.real_septicake.compressed_pollution.caps.LevelPollutionAttacher;
+import io.github.real_septicake.compressed_pollution.compat.ae2.AE2CompatHandler;
 import io.github.real_septicake.compressed_pollution.events.ClassedPollutionEvent;
 import io.github.real_septicake.compressed_pollution.events.PollutionEventFactory;
 import net.minecraft.core.BlockPos;
@@ -26,6 +30,7 @@ import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.*;
@@ -48,6 +53,18 @@ public class CompressedPollution
      */
     public static final long POLLUTION_VALUE_CAP = 9_200_000_000_000_000_000L;
 
+    /**
+     * A util function for guaranteeing that the result will remain within a reasonable range
+     * @param v1 The first value
+     * @param v2 The second value
+     * @return Either {@link CompressedPollution#POLLUTION_VALUE_CAP} if the resulting value would be too large, or the result if not
+     */
+    public static long safeMult(long v1, long v2) {
+        if(Math.abs(v2) >= (POLLUTION_VALUE_CAP / Math.abs(v2)))
+            return POLLUTION_VALUE_CAP;
+        return v1 * v2;
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger("CompressedPollution");
 
     /**
@@ -56,9 +73,9 @@ public class CompressedPollution
     public static final String MODID = "compressed_pollution";
 
     /** Registry key for Item pollution values */
-    public static final ResourceKey<Registry<PollutionEntry<Item>>> POLLUTION_ITEM_REGISTRY_KEY = ResourceKey.createRegistryKey(id("pollutions/item"));
+    public static final ResourceKey<Registry<TaggedPollutionEntry<Item>>> POLLUTION_ITEM_REGISTRY_KEY = ResourceKey.createRegistryKey(id("pollutions/item"));
     /** Registry key for Fluid pollution values */
-    public static final ResourceKey<Registry<PollutionEntry<Fluid>>> POLLUTION_FLUID_REGISTRY_KEY = ResourceKey.createRegistryKey(id("pollutions/fluid"));
+    public static final ResourceKey<Registry<TaggedPollutionEntry<Fluid>>> POLLUTION_FLUID_REGISTRY_KEY = ResourceKey.createRegistryKey(id("pollutions/fluid"));
 
     /** The resolver for {@link Item}s */
     public static final PollutionRegistryResolver<Item> ITEM_RESOLVER = new PollutionRegistryResolver<>(
@@ -107,8 +124,8 @@ public class CompressedPollution
     {
         context.getModEventBus().addListener(CompressedPollution::dataGen);
         context.getModEventBus().addListener((DataPackRegistryEvent.NewRegistry evt) -> {
-            evt.dataPackRegistry(POLLUTION_ITEM_REGISTRY_KEY, PollutionEntry.codec(ForgeRegistries.ITEMS.getRegistryKey()));
-            evt.dataPackRegistry(POLLUTION_FLUID_REGISTRY_KEY, PollutionEntry.codec(ForgeRegistries.FLUIDS.getRegistryKey()));
+            evt.dataPackRegistry(POLLUTION_ITEM_REGISTRY_KEY, TaggedPollutionEntry.codec(ForgeRegistries.ITEMS.getRegistryKey()));
+            evt.dataPackRegistry(POLLUTION_FLUID_REGISTRY_KEY, TaggedPollutionEntry.codec(ForgeRegistries.FLUIDS.getRegistryKey()));
         });
 
         MinecraftForge.EVENT_BUS.addGenericListener(Level.class, (AttachCapabilitiesEvent<Level> evt) -> {
@@ -122,14 +139,40 @@ public class CompressedPollution
             if(evt.getObj().isSame(Fluids.LAVA))
                 evt.setCanceled(true);
         });
+
+        if(ModList.get().isLoaded("appliedenergistics2")) {
+            try {
+                AE2CompatHandler.instance().addHandler(
+                        AEItemKey.class,
+                        (key, amount, level, pos) -> {
+                            if(key.getItem() instanceof PollutionContainer c) {
+                                c.compressedPollution$handleContents(key.toStack((int) amount), level, amount, pos);
+                            }
+                            CompressedPollution.ITEM_RESOLVER.fireEvent(
+                                    level, key.getItem(), pos, p -> p.multiply(amount)
+                            );
+                        },
+                        MODID
+                );
+                AE2CompatHandler.instance().addHandler(
+                        AEFluidKey.class,
+                        (key, amount, level, sourcePos) -> {
+                            CompressedPollution.FLUID_RESOLVER.fireEvent(
+                                    level, key.getFluid(), sourcePos, p -> p.multiply(amount)
+                            );
+                        },
+                        MODID
+                );
+            } catch (AE2CompatHandler.AlreadyPresentException ignored) {}
+        }
     }
 
-    public static final ResourceKey<PollutionEntry<Item>> CARBON_MONOXIDE_POLLUTION = ResourceKey.create(
+    public static final ResourceKey<TaggedPollutionEntry<Item>> CARBON_MONOXIDE_POLLUTION = ResourceKey.create(
             POLLUTION_ITEM_REGISTRY_KEY,
             id("carbon_monoxide")
     );
 
-    public static final ResourceKey<PollutionEntry<Fluid>> CARBON_DIOXIDE_POLLUTION = ResourceKey.create(
+    public static final ResourceKey<TaggedPollutionEntry<Fluid>> CARBON_DIOXIDE_POLLUTION = ResourceKey.create(
             POLLUTION_FLUID_REGISTRY_KEY,
             id("carbon_dioxide")
     );
@@ -139,7 +182,7 @@ public class CompressedPollution
         DataGenerator generator = evt.getGenerator();
         final var packOutput = generator.getPackOutput();
 
-        PollutionEntry<Item> pb = new PollutionEntry.Builder<Item>()
+        TaggedPollutionEntry<Item> pb = new TaggedPollutionEntry.Builder<Item>()
                 .putValue(ResourceLocation.withDefaultNamespace("dirt"), 10L)
                 .putValue(ResourceLocation.withDefaultNamespace("cherry_log"), 5L)
                 .putValue(ResourceLocation.withDefaultNamespace("birch_log"), 0L)
@@ -163,7 +206,7 @@ public class CompressedPollution
                         bootstrap -> {
                             bootstrap.register(
                                     CARBON_DIOXIDE_POLLUTION,
-                                    new PollutionEntry.Builder<Fluid>().putValue(
+                                    new TaggedPollutionEntry.Builder<Fluid>().putValue(
                                             ResourceLocation.fromNamespaceAndPath("immersivepetroleum", "gasoline"),
                                             1
                                     ).putTag(
