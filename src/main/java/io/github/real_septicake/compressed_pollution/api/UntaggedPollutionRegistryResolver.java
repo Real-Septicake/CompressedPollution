@@ -50,9 +50,7 @@ public abstract class UntaggedPollutionRegistryResolver<T> {
         }
         Pollution.PollutionBuilder builder = new Pollution.PollutionBuilder();
         access.registryOrThrow(registryKey).entrySet().forEach(
-                entry -> {
-                    builder.put(entry.getKey().location().toString(), entry.getValue().values().getOrDefault(loc, 0L));
-                }
+                entry -> builder.put(entry.getKey().location().toString(), entry.getValue().values().getOrDefault(loc, 0L))
         );
         profiler.ifPresent(ProfilerFiller::pop);
         Pollution created = builder.build();

@@ -6,7 +6,6 @@ import io.github.real_septicake.compressed_pollution.CompressedPollution;
 import io.github.real_septicake.compressed_pollution.Pollution;
 import io.github.real_septicake.compressed_pollution.TaggedPollutionEntry;
 import io.github.real_septicake.compressed_pollution.events.ClassedPollutionEvent;
-import io.github.real_septicake.compressed_pollution.events.PollutionEventFactory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
