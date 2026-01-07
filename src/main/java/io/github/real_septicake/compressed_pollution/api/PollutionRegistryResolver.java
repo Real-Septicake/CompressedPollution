@@ -46,9 +46,9 @@ public abstract class PollutionRegistryResolver<T> {
     }
 
     /**
-     * Transforms the given object into its ResourceLocation
+     * Transforms the given object into its <code>ResourceLocation</code>
      * @param obj The object to transform
-     * @return The object's ResourceLocation
+     * @return The object's <code>ResourceLocation</code>
      */
     public abstract ResourceLocation toRL(T obj);
 
