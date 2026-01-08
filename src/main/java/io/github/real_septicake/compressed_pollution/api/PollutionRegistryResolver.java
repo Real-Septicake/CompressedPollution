@@ -5,7 +5,7 @@ import com.google.common.cache.CacheBuilder;
 import io.github.real_septicake.compressed_pollution.CompressedPollution;
 import io.github.real_septicake.compressed_pollution.Pollution;
 import io.github.real_septicake.compressed_pollution.TaggedPollutionEntry;
-import io.github.real_septicake.compressed_pollution.events.ClassedPollutionEvent;
+import io.github.real_septicake.compressed_pollution.events.PollutionEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -35,7 +35,7 @@ public abstract class PollutionRegistryResolver<T> {
     /**
      * Creates a resolver for the class
      * @param cacheTimer The number of minutes the entries should remain within the cache
-     * @param tClass The class to fire the {@link ClassedPollutionEvent} for
+     * @param tClass The class to fire the {@link PollutionEvent} for
      * @param rKey The registry to access for the pollution values. Must be visible server-side
      */
     public PollutionRegistryResolver(long cacheTimer, Class<T> tClass, ResourceKey<Registry<TaggedPollutionEntry<T>>> rKey) {
@@ -108,7 +108,7 @@ public abstract class PollutionRegistryResolver<T> {
     }
 
     /**
-     * Calls {@link PollutionRegistryResolver#resolve} on the provided object, and fires the {@link ClassedPollutionEvent}
+     * Calls {@link PollutionRegistryResolver#resolve} on the provided object, and fires the {@link PollutionEvent}
      * for its class
      * @param level The level the pollution will be applied to
      * @param obj The object causing the pollution

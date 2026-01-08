@@ -1,6 +1,7 @@
 package io.github.real_septicake.compressed_pollution.mixin;
 
 import io.github.real_septicake.compressed_pollution.CompressedPollution;
+import io.github.real_septicake.compressed_pollution.api.DropsOnDestroy;
 import io.github.real_septicake.compressed_pollution.api.PollutionContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -52,7 +53,7 @@ public abstract class BlockItemDestructionMixin implements PollutionContainer {
 
     @Override
     public void compressedPollution$handleContents(ItemStack self, ServerLevel level, long count, @Nullable BlockPos sourcePos) {
-        if(this.getBlock() instanceof PollutionContainer c) {
+        if(this.getBlock() instanceof PollutionContainer c && !(this.getBlock() instanceof DropsOnDestroy)) {
             c.compressedPollution$handleContents(self, level, count, sourcePos);
         }
     }

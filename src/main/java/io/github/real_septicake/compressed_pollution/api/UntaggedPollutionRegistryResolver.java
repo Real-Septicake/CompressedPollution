@@ -5,8 +5,7 @@ import com.google.common.cache.CacheBuilder;
 import io.github.real_septicake.compressed_pollution.CompressedPollution;
 import io.github.real_septicake.compressed_pollution.Pollution;
 import io.github.real_septicake.compressed_pollution.UntaggedPollutionEntry;
-import io.github.real_septicake.compressed_pollution.events.ClassedPollutionEvent;
-import io.github.real_septicake.compressed_pollution.events.PollutionEventFactory;
+import io.github.real_septicake.compressed_pollution.events.PollutionEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -83,7 +82,7 @@ public abstract class UntaggedPollutionRegistryResolver<T> {
     }
 
     /**
-     * Calls {@link PollutionRegistryResolver#resolve} on the provided object, and fires the {@link ClassedPollutionEvent}
+     * Calls {@link PollutionRegistryResolver#resolve} on the provided object, and fires the {@link PollutionEvent}
      * for its class
      * @param level The level the pollution will be applied to
      * @param obj The object causing the pollution
@@ -109,23 +108,6 @@ public abstract class UntaggedPollutionRegistryResolver<T> {
         trans.accept(p);
         CompressedPollution.handlePollution(
                 p, level, obj, clazz, sourcePos
-        );
-    }
-
-    /**
-     * Similar to {@link PollutionRegistryResolver#fireEvent(ServerLevel, Object, BlockPos)}, but applies <code>trans</code> before
-     * firing the event created by <code>factory</code>
-     * @param level The level the pollution will be applied to
-     * @param obj The object causing the pollution
-     * @param sourcePos The position of the object causing the pollution, or null if no appropriate position exists
-     * @param trans The {@link Pollution} transformer to be applied
-     * @param factory The factory for the event to fire
-     */
-    public final void fireEvent(ServerLevel level, T obj, @Nullable BlockPos sourcePos, Consumer<Pollution> trans, PollutionEventFactory<T> factory) {
-        Pollution p = resolve(level.registryAccess(), obj, Optional.of(level.getProfiler()));
-        trans.accept(p);
-        CompressedPollution.handlePollution(
-                p, level, obj, clazz, sourcePos, factory
         );
     }
 }

@@ -3,6 +3,7 @@ package io.github.real_septicake.compressed_pollution.events;
 import io.github.real_septicake.compressed_pollution.Pollution;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.GenericEvent;
 
 import javax.annotation.Nullable;
@@ -12,16 +13,25 @@ import javax.annotation.Nullable;
  * or modified to change what values each pollution causes.
  * @param <T> The type to filter this event to
  */
-public abstract class PollutionEvent<T> extends GenericEvent<T> {
-    private final ServerLevel level;
+@Cancelable
+public class PollutionEvent<T> extends GenericEvent<T> {
     private final Pollution pollution;
+    private final T obj;
+    private final ServerLevel level;
     private final @Nullable BlockPos sourcePos;
-
-    public PollutionEvent(Class<T> clazz, ServerLevel level, Pollution pollution, @Nullable BlockPos sourcePos) {
+    public PollutionEvent(Class<T> clazz, Pollution pollution, T obj, ServerLevel level, @Nullable BlockPos sourcePos) {
         super(clazz);
         this.level = level;
         this.pollution = pollution;
         this.sourcePos = sourcePos;
+        this.obj = obj;
+    }
+
+    /**
+     * @return The object causing the pollution
+     */
+    public T getObj() {
+        return obj;
     }
 
     /**

@@ -46,6 +46,8 @@ public class LevelPollution {
             else
                 pollutants.remove(key);
         }
+
+        CompressedPollution.LOGGER.debug("Pollution applied: {}", pollution);
     }
 
     public static final Codec<LevelPollution> CODEC = RecordCodecBuilder.create(instance -> instance.group(
