@@ -1,5 +1,6 @@
 package io.github.real_septicake.compressed_pollution.caps;
 
+import io.github.real_septicake.compressed_pollution.LevelPollution;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import org.jetbrains.annotations.NotNull;
@@ -7,7 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nonnull;
 
 public class LevelPollutionCapability implements ILevelPollution {
-    @Nonnull LevelPollution pollution = new LevelPollution();
+    @Nonnull
+    LevelPollution pollution = new LevelPollution();
 
     @Override
     public @NotNull LevelPollution getPollution() {

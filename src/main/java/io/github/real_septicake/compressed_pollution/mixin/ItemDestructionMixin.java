@@ -1,6 +1,7 @@
 package io.github.real_septicake.compressed_pollution.mixin;
 
 import io.github.real_septicake.compressed_pollution.CompressedPollution;
+import io.github.real_septicake.compressed_pollution.api.PollutionContainer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
@@ -14,11 +15,12 @@ public class ItemDestructionMixin {
     @Inject(method = "onDestroyed", at = @At("HEAD"))
     private void pollutionTime(ItemEntity item, CallbackInfo ci) {
         if(!item.level().isClientSide) {
-            CompressedPollution.handlePollution(
-                    CompressedPollution.pollutionForItem(item.level().registryAccess(), item.getItem(), item.level().getProfiler()).multiply(item.getItem().getCount()),
-                    (ServerLevel) item.level(),
-                    item.getItem().getItem(),
-                    Item.class
+            if(item.getItem().getItem() instanceof PollutionContainer c) {
+                c.compressedPollution$handleContents(item.getItem(), (ServerLevel) item.level(), item.getItem().getCount(), item.blockPosition());
+            }
+            CompressedPollution.ITEM_RESOLVER.fireEvent(
+                    (ServerLevel) item.level(), item.getItem().getItem(),
+                    item.blockPosition(), p -> p.multiply(item.getItem().getCount())
             );
         }
     }

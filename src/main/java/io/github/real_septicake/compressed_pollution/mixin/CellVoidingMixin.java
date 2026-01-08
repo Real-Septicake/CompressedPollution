@@ -2,23 +2,15 @@ package io.github.real_septicake.compressed_pollution.mixin;
 
 import appeng.api.config.Actionable;
 import appeng.api.networking.IGridNode;
-import appeng.api.networking.security.IActionHost;
 import appeng.api.networking.security.IActionSource;
-import appeng.api.stacks.AEFluidKey;
-import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
-import appeng.api.stacks.AEKeyType;
 import appeng.me.cells.BasicCellInventory;
 import com.llamalad7.mixinextras.sugar.Local;
 import io.github.real_septicake.compressed_pollution.CompressedPollution;
+import io.github.real_septicake.compressed_pollution.compat.ae2.AE2CompatHandler;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.material.Fluid;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
@@ -42,26 +34,15 @@ public abstract class CellVoidingMixin {
                     level = host.getLevel();
             } else if(source.player().isPresent()) {
                 Level l = source.player().get().level();
-                if(!l.isClientSide) // Prevent attempting to get a client level
+                if(!l.isClientSide) // Prevent attempting to get a client's level
                     level = (ServerLevel) l;
             }
             if(level != null) {
-                if (what instanceof AEItemKey) {
-                    CompressedPollution.handlePollution(
-                            CompressedPollution.pollutionForItem(level.registryAccess(), ((AEItemKey) what).toStack(), level.getProfiler()).multiply(count),
-                            level,
-                            ((AEItemKey) what).toStack().getItem(),
-                            Item.class
-                    );
-                }
-                if(what instanceof AEFluidKey) {
-                    CompressedPollution.handlePollution(
-                            CompressedPollution.pollutionForFluid(level.registryAccess(), ((AEFluidKey) what).getFluid(), level.getProfiler()).multiply(count),
-                            level,
-                            ((AEFluidKey) what).getFluid(),
-                            Fluid.class
-                    );
-                }
+                AE2CompatHandler.KeyHandler<AEKey> handler = AE2CompatHandler.INSTANCE.getHandler(what.getClass());
+                if(handler != null)
+                    handler.handle(what, count, level, null);
+                else
+                    CompressedPollution.LOGGER.warn("Unhandled AE2 key type: {}", what.getClass().getSimpleName());
             }
         }
     }

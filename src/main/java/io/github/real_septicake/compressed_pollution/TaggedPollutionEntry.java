@@ -18,14 +18,14 @@ import java.util.Map;
  * @param tags The values of tags for this pollution
  * @param <T> The type of object represented e.g. Item or Fluid
  */
-public record PollutionEntry<T>(Map<ResourceLocation, Long> values, List<PollutionTag<T>> tags) {
+public record TaggedPollutionEntry<T>(Map<ResourceLocation, Long> values, List<PollutionTag<T>> tags) {
     /**
      * Creates a codec for the values of the specified registry
      * @param registry The registry to create the entry codec for
      * @return The codec for the values
      * @param <R> The type of object represented e.g. Item or Fluid
      */
-    public static <R> Codec<PollutionEntry<R>> codec(ResourceKey<Registry<R>> registry) {
+    public static <R> Codec<TaggedPollutionEntry<R>> codec(ResourceKey<Registry<R>> registry) {
         return RecordCodecBuilder.create(instance -> instance.
                 group(
                         Codec.unboundedMap(ResourceLocation.CODEC, Codec.LONG).fieldOf("values").forGetter(it -> it.values),
@@ -37,7 +37,7 @@ public record PollutionEntry<T>(Map<ResourceLocation, Long> values, List<Polluti
                                         ).apply(tag, tag.stable(PollutionTag<R>::new))
                                 )
                         ).optionalFieldOf("tags", new ArrayList<>()).forGetter(it -> it.tags)
-                ).apply(instance, instance.stable(PollutionEntry::new))
+                ).apply(instance, instance.stable(TaggedPollutionEntry::new))
         );
     }
 
@@ -50,7 +50,7 @@ public record PollutionEntry<T>(Map<ResourceLocation, Long> values, List<Polluti
     public record PollutionTag<T>(TagKey<T> tag, long value) {}
 
     /**
-     * A convenience factory for a {@link PollutionEntry} object. Intended for use with datagen
+     * A convenience factory for a {@link TaggedPollutionEntry} object. Intended for use with datagen
      * @param <T> The type of object represented e.g. Item or Fluid
      */
     public static class Builder<T> {
@@ -73,7 +73,7 @@ public record PollutionEntry<T>(Map<ResourceLocation, Long> values, List<Polluti
          */
         public Builder<T> putValue(ResourceLocation loc, long value) {
             long v = values.getOrDefault(loc, 0L);
-            values.put(loc, v + value);
+            values.put(loc, LongUtil.safeAdd(v, value));
             return this;
         }
 
@@ -89,11 +89,11 @@ public record PollutionEntry<T>(Map<ResourceLocation, Long> values, List<Polluti
         }
 
         /**
-         * Creates the {@link PollutionEntry} this builder currently represents
+         * Creates the {@link TaggedPollutionEntry} this builder currently represents
          * @return The created PollutionEntry
          */
-        public PollutionEntry<T> build() {
-            return new PollutionEntry<>(values, tags);
+        public TaggedPollutionEntry<T> build() {
+            return new TaggedPollutionEntry<>(values, tags);
         }
     }
 }

@@ -24,7 +24,8 @@ mixin {
 }
 
 javadoc {
-    exclude("io/github/real_septicake/compressed_pollution/mixin/**")
+    exclude("io/github/real_septicake/compressed_pollution/mixin/**") // No need to track mixins
+    exclude("io/github/real_septicake/compressed_pollution/caps/**")
 }
 
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
@@ -133,6 +134,7 @@ repositories {
         // For Gradle 5.1 and above, limit it to just AE2
         content {
             includeGroup 'appeng'
+            includeGroup 'mekanism'
         }
     }
     maven {
@@ -178,6 +180,7 @@ dependencies {
 //        compileOnly "curse.maven:immersive-engineering-231951:6206989"
         compileOnly "curse.maven:sophisticated-backpacks-422301:7116643"
         compileOnly "curse.maven:sophisticated-core-618298:7077001"
+        compileOnly "mekanism:Mekanism:1.20.1-10.4.16.80"
     } else {
         implementation fg.deobf("appeng:appliedenergistics2-forge:15.4.9")
         implementation fg.deobf("org.appliedenergistics:guideme:20.1.14")
@@ -186,6 +189,7 @@ dependencies {
         implementation fg.deobf("curse.maven:immersive-engineering-231951:6206989")
         implementation fg.deobf("curse.maven:sophisticated-backpacks-422301:7116643")
         implementation fg.deobf("curse.maven:sophisticated-core-618298:7077001")
+        implementation fg.deobf("mekanism:Mekanism:1.20.1-10.4.16.80")
     }
 }
 
