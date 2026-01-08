@@ -11,6 +11,8 @@ import java.util.Map;
 
 /**
  * Compatibility layer for AE2 drives
+ * <p>
+ * Make sure to check that AE2 is loaded before using
  */
 public class AE2CompatHandler {
     /**

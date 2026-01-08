@@ -65,7 +65,10 @@ public class CompressedPollution
         return v1 * v2;
     }
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("CompressedPollution");
+    /**
+     * Logger
+     */
+    public static final Logger LOGGER = LoggerFactory.getLogger("CompressedPollution");
 
     /**
      * Mod ID
@@ -140,13 +143,13 @@ public class CompressedPollution
                 evt.setCanceled(true);
         });
 
-        if(ModList.get().isLoaded("appliedenergistics2")) {
+        if(ModList.get().isLoaded("ae2")) {
             try {
                 AE2CompatHandler.instance().addHandler(
                         AEItemKey.class,
                         (key, amount, level, pos) -> {
                             if(key.getItem() instanceof PollutionContainer c) {
-                                c.compressedPollution$handleContents(key.toStack((int) amount), level, amount, pos);
+                                c.compressedPollution$handleContents(key.toStack(), level, amount, pos);
                             }
                             CompressedPollution.ITEM_RESOLVER.fireEvent(
                                     level, key.getItem(), pos, p -> p.multiply(amount)
@@ -163,7 +166,7 @@ public class CompressedPollution
                         },
                         MODID
                 );
-            } catch (AE2CompatHandler.AlreadyPresentException ignored) {}
+            } catch (AE2CompatHandler.AlreadyPresentException ignored) {} // should never happen for any reason
         }
     }
 

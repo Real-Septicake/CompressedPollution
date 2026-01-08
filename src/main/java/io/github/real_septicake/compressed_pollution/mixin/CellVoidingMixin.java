@@ -6,11 +6,10 @@ import appeng.api.networking.security.IActionSource;
 import appeng.api.stacks.AEKey;
 import appeng.me.cells.BasicCellInventory;
 import com.llamalad7.mixinextras.sugar.Local;
+import io.github.real_septicake.compressed_pollution.CompressedPollution;
 import io.github.real_septicake.compressed_pollution.compat.ae2.AE2CompatHandler;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,9 +23,6 @@ public abstract class CellVoidingMixin {
     @Final
     private boolean hasVoidUpgrade;
 
-    @Unique
-    private final static Logger compressedPollution$LOGGER = LoggerFactory.getLogger("CellItemVoiding");
-
     @Inject(method = "insert", at = @At(value = "RETURN"), slice = @Slice(from = @At(value = "INVOKE", target = "Lappeng/me/cells/BasicCellInventory;innerInsert(Lappeng/api/stacks/AEKey;JLappeng/api/config/Actionable;)J")), remap = false)
     private void polluteOnVoid(AEKey what, long amount, Actionable mode, IActionSource source, CallbackInfoReturnable<Long> cir, @Local(name = "inserted") long inserted) {
         if(hasVoidUpgrade && cir.getReturnValue() != inserted && !mode.isSimulate()) {
@@ -38,7 +34,7 @@ public abstract class CellVoidingMixin {
                     level = host.getLevel();
             } else if(source.player().isPresent()) {
                 Level l = source.player().get().level();
-                if(!l.isClientSide) // Prevent attempting to get a client level
+                if(!l.isClientSide) // Prevent attempting to get a client's level
                     level = (ServerLevel) l;
             }
             if(level != null) {
@@ -46,7 +42,7 @@ public abstract class CellVoidingMixin {
                 if(handler != null)
                     handler.handle(what, count, level, null);
                 else
-                    compressedPollution$LOGGER.warn("Unhandled AE2 key type: {}", what.getClass().getSimpleName());
+                    CompressedPollution.LOGGER.warn("Unhandled AE2 key type: {}", what.getClass().getSimpleName());
             }
         }
     }

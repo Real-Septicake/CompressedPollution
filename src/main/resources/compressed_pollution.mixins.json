@@ -18,6 +18,7 @@
     "ItemDestructionMixin",
     "PackageItemDestructionMixin",
     "PistonFluidDestructionMixin",
+    "QIODestructionMixin",
     "ShulkerBoxMixin"
   ],
   "injectors": {
