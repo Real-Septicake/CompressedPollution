@@ -56,12 +56,11 @@ public record Pollution(@Nonnull Map<String, Long> values) {
             if(value == 0)
                 return this;
             long init = values.getOrDefault(pollution, 0L);
-            if(Math.abs(init + value) >= CompressedPollution.POLLUTION_VALUE_CAP)
-                values.put(pollution, (long) (CompressedPollution.POLLUTION_VALUE_CAP * Math.signum(init)));
-            else if(init + value == 0L)
-                values.remove(pollution);
+            long v = LongUtil.safeAdd(init, value);
+            if(v != 0L)
+                values.put(pollution, v);
             else
-                values.put(pollution, init + value);
+                values.remove(pollution);
             return this;
         }
 
@@ -85,12 +84,12 @@ public record Pollution(@Nonnull Map<String, Long> values) {
      * Multiplies the values of this pollution instance by the value provided, the results of which are capped to
      * 9.2 quintillion to prevent possible overflows
      *
-     * @param val The value to multiply, 0 clears <i>all</i> values
+     * @param val The value to multiply, 0 clears all values
      * @return Self for chaining
      */
     public Pollution multiply(long val) {
         if (val != 0)
-            values.replaceAll((s, v) -> CompressedPollution.safeMult(v, val));
+            values.replaceAll((s, v) -> LongUtil.safeMult(v, val));
         else
             values.clear();
         return this;
@@ -121,10 +120,11 @@ public record Pollution(@Nonnull Map<String, Long> values) {
         if(value == 0)
             return this;
         long init = values.getOrDefault(pollution, 0L);
-        if(Math.abs(init + value) >= CompressedPollution.POLLUTION_VALUE_CAP)
-            values.put(pollution, (long) (CompressedPollution.POLLUTION_VALUE_CAP * Math.signum(init)));
+        long val = LongUtil.safeAdd(value, init);
+        if(val != 0)
+            values.put(pollution, val);
         else
-            values.put(pollution, init + value);
+            values.remove(pollution);
         return this;
     }
 

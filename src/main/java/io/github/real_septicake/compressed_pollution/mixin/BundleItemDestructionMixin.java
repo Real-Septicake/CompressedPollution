@@ -1,6 +1,7 @@
 package io.github.real_septicake.compressed_pollution.mixin;
 
 import io.github.real_septicake.compressed_pollution.CompressedPollution;
+import io.github.real_septicake.compressed_pollution.LongUtil;
 import io.github.real_septicake.compressed_pollution.api.PollutionContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -34,7 +35,7 @@ public abstract class BundleItemDestructionMixin implements PollutionContainer {
     public void compressedPollution$handleContents(ItemStack self, ServerLevel level, long count, @Nullable BlockPos sourcePos) {
         getContents(self).forEach(itemStack -> {
             if(itemStack.getItem() instanceof PollutionContainer c)
-                c.compressedPollution$handleContents(itemStack, level, CompressedPollution.safeMult(count, itemStack.getCount()), sourcePos);
+                c.compressedPollution$handleContents(itemStack, level, LongUtil.safeMult(count, itemStack.getCount()), sourcePos);
             CompressedPollution.ITEM_RESOLVER.fireEvent(
                     level, itemStack.getItem(), sourcePos
             );

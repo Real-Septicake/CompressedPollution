@@ -4,7 +4,7 @@ import appeng.api.stacks.AEKey;
 import appeng.items.AEBaseItem;
 import appeng.items.storage.BasicStorageCell;
 import com.google.common.collect.Streams;
-import io.github.real_septicake.compressed_pollution.CompressedPollution;
+import io.github.real_septicake.compressed_pollution.LongUtil;
 import io.github.real_septicake.compressed_pollution.api.PollutionContainer;
 import io.github.real_septicake.compressed_pollution.compat.ae2.AE2CompatHandler;
 import net.minecraft.core.BlockPos;
@@ -57,9 +57,9 @@ public class CellItemDestructionMixin extends AEBaseItem implements PollutionCon
                 (amt, tag) -> {
                     AEKey key = AEKey.fromTagGeneric(tag);
                     if(key != null) {
-                        AE2CompatHandler.KeyHandler<AEKey> handler = AE2CompatHandler.instance().getHandler(key.getClass());
+                        AE2CompatHandler.KeyHandler<AEKey> handler = AE2CompatHandler.INSTANCE.getHandler(key.getClass());
                         if (handler != null)
-                            handler.handle(key, CompressedPollution.safeMult(amt, count), level, sourcePos);
+                            handler.handle(key, LongUtil.safeMult(amt, count), level, sourcePos);
                         else
                             compressedPollution$LOGGER.warn("Unhandled AE2 key type: {}", key.getClass().getSimpleName());
                     }

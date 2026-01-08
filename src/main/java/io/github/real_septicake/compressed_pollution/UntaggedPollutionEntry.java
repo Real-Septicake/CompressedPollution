@@ -39,7 +39,7 @@ public record UntaggedPollutionEntry(Map<ResourceLocation, Long> values) {
          */
         public Builder put(ResourceLocation loc, long value) {
             long v = values.getOrDefault(loc, 0L);
-            values.put(loc, v + value);
+            values.put(loc, LongUtil.safeAdd(v, value));
             return this;
         }
 

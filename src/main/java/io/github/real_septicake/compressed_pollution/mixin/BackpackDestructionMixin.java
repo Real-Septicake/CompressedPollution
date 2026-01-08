@@ -1,6 +1,6 @@
 package io.github.real_septicake.compressed_pollution.mixin;
 
-import io.github.real_septicake.compressed_pollution.CompressedPollution;
+import io.github.real_septicake.compressed_pollution.LongUtil;
 import io.github.real_septicake.compressed_pollution.api.PollutionContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -36,7 +36,7 @@ public abstract class BackpackDestructionMixin extends ItemBase implements Pollu
             ItemStack stack = handler.getStackInSlot(i);
             if(!stack.isEmpty()) {
                 if(stack.getItem() instanceof PollutionContainer c)
-                    c.compressedPollution$handleContents(stack, level, CompressedPollution.safeMult(count, stack.getCount()), sourcePos);
+                    c.compressedPollution$handleContents(stack, level, LongUtil.safeMult(count, stack.getCount()), sourcePos);
             }
         }
     }

@@ -1,6 +1,7 @@
 package io.github.real_septicake.compressed_pollution.mixin;
 
 import io.github.real_septicake.compressed_pollution.CompressedPollution;
+import io.github.real_septicake.compressed_pollution.LongUtil;
 import io.github.real_septicake.compressed_pollution.api.PollutionContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -24,10 +25,10 @@ public class ShulkerBoxMixin implements PollutionContainer {
             Stream<ItemStack> contents = list.stream().map(CompoundTag.class::cast).map(ItemStack::of);
             contents.forEach(itemStack -> {
                 if(itemStack.getItem() instanceof PollutionContainer c) {
-                    c.compressedPollution$handleContents(itemStack, level, CompressedPollution.safeMult(count, itemStack.getCount()), sourcePos);
+                    c.compressedPollution$handleContents(itemStack, level, LongUtil.safeMult(count, itemStack.getCount()), sourcePos);
                 }
                 CompressedPollution.ITEM_RESOLVER.fireEvent(
-                        level, itemStack.getItem(), sourcePos, p -> p.multiply(CompressedPollution.safeMult(count, itemStack.getCount()))
+                        level, itemStack.getItem(), sourcePos, p -> p.multiply(LongUtil.safeMult(count, itemStack.getCount()))
                 );
             });
         }

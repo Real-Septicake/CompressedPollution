@@ -21,6 +21,7 @@ build
 eclipse
 run
 run-data
+# nothing being generated needs to be on the repo
 src/generated
 
 # Files from Forge MDK

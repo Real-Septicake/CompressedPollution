@@ -36,24 +36,15 @@ public class LevelPollution {
             long applying = pollution.values().get(key);
             if(applying == 0L) // Nothing to apply
                 continue;
-            if(current == 0L) { // No checks needed
+            if(current == 0L) { // Can't overflow
                 pollutants.put(key, applying);
                 continue;
             }
-            if(Math.signum(current) != Math.signum(applying))
-                pollutants.put(key, current + applying);
-            else {
-                long value;
-                if(Math.abs(applying) >= (CompressedPollution.POLLUTION_VALUE_CAP - Math.abs(current)))
-                    value = CompressedPollution.POLLUTION_VALUE_CAP;
-                else
-                    value = applying + current;
-
-                if(value == 0L)
-                    pollutants.remove(key);
-                else
-                    pollutants.put(key, value);
-            }
+            long v = LongUtil.safeAdd(current, applying);
+            if(v != 0)
+                pollutants.put(key, v);
+            else
+                pollutants.remove(key);
         }
     }
 

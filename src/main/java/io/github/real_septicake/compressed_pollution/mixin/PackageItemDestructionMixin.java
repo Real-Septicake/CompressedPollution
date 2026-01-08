@@ -3,6 +3,7 @@ package io.github.real_septicake.compressed_pollution.mixin;
 import agency.highlysuspect.packages.craftful.item.PackageItem;
 import agency.highlysuspect.packages.craftful.junk.PackageContainer;
 import io.github.real_septicake.compressed_pollution.CompressedPollution;
+import io.github.real_septicake.compressed_pollution.LongUtil;
 import io.github.real_septicake.compressed_pollution.api.PollutionContainer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -30,7 +31,7 @@ public class PackageItemDestructionMixin extends BlockItem {
             if(stack.getItem() instanceof PollutionContainer c)
                 c.compressedPollution$handleContents(
                         stack, (ServerLevel) item.level(),
-                        CompressedPollution.safeMult(stats.fullyMultipliedCount(), item.getItem().getCount()), item.blockPosition()
+                        LongUtil.safeMult(stats.fullyMultipliedCount(), item.getItem().getCount()), item.blockPosition()
                 );
             CompressedPollution.ITEM_RESOLVER.fireEvent(
                     (ServerLevel) item.level(), stats.rootContents().getItem(),

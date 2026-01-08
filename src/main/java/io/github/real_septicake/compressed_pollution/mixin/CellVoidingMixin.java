@@ -38,7 +38,7 @@ public abstract class CellVoidingMixin {
                     level = (ServerLevel) l;
             }
             if(level != null) {
-                AE2CompatHandler.KeyHandler<AEKey> handler = AE2CompatHandler.instance().getHandler(what.getClass());
+                AE2CompatHandler.KeyHandler<AEKey> handler = AE2CompatHandler.INSTANCE.getHandler(what.getClass());
                 if(handler != null)
                     handler.handle(what, count, level, null);
                 else

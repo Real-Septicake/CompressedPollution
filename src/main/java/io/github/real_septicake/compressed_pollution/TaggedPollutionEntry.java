@@ -73,7 +73,7 @@ public record TaggedPollutionEntry<T>(Map<ResourceLocation, Long> values, List<P
          */
         public Builder<T> putValue(ResourceLocation loc, long value) {
             long v = values.getOrDefault(loc, 0L);
-            values.put(loc, v + value);
+            values.put(loc, LongUtil.safeAdd(v, value));
             return this;
         }
 

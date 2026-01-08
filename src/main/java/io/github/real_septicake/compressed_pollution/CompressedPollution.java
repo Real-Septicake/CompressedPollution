@@ -49,23 +49,6 @@ public class CompressedPollution
     public static final Capability<ILevelPollution> LEVEL_POLLUTION_CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 
     /**
-     * A pollution value cannot go above this value, or below its negative
-     */
-    public static final long POLLUTION_VALUE_CAP = 9_200_000_000_000_000_000L;
-
-    /**
-     * A util function for guaranteeing that the result will remain within a reasonable range
-     * @param v1 The first value
-     * @param v2 The second value
-     * @return Either {@link CompressedPollution#POLLUTION_VALUE_CAP} if the resulting value would be too large, or the result if not
-     */
-    public static long safeMult(long v1, long v2) {
-        if(Math.abs(v2) >= (POLLUTION_VALUE_CAP / Math.abs(v2)))
-            return POLLUTION_VALUE_CAP;
-        return v1 * v2;
-    }
-
-    /**
      * Logger
      */
     public static final Logger LOGGER = LoggerFactory.getLogger("CompressedPollution");
@@ -145,7 +128,7 @@ public class CompressedPollution
 
         if(ModList.get().isLoaded("ae2")) {
             try {
-                AE2CompatHandler.instance().addHandler(
+                AE2CompatHandler.INSTANCE.addHandler(
                         AEItemKey.class,
                         (key, amount, level, pos) -> {
                             if(key.getItem() instanceof PollutionContainer c) {
@@ -157,7 +140,7 @@ public class CompressedPollution
                         },
                         MODID
                 );
-                AE2CompatHandler.instance().addHandler(
+                AE2CompatHandler.INSTANCE.addHandler(
                         AEFluidKey.class,
                         (key, amount, level, sourcePos) -> {
                             CompressedPollution.FLUID_RESOLVER.fireEvent(
