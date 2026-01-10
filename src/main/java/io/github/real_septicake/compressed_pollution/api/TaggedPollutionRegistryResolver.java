@@ -26,7 +26,7 @@ import java.util.function.Consumer;
  * @param <T> The type of object handled by the instance
  */
 @Nonnull
-public abstract class PollutionRegistryResolver<T> {
+public abstract class TaggedPollutionRegistryResolver<T> {
     private final Cache<ResourceLocation, Pollution> CACHE;
     private final Class<T> clazz;
     private final ResourceKey<Registry<TaggedPollutionEntry<T>>> registryKey;
@@ -38,7 +38,7 @@ public abstract class PollutionRegistryResolver<T> {
      * @param tClass The class to fire the {@link PollutionEvent} for
      * @param rKey The registry to access for the pollution values. Must be visible server-side
      */
-    public PollutionRegistryResolver(long cacheTimer, Class<T> tClass, ResourceKey<Registry<TaggedPollutionEntry<T>>> rKey) {
+    public TaggedPollutionRegistryResolver(long cacheTimer, Class<T> tClass, ResourceKey<Registry<TaggedPollutionEntry<T>>> rKey) {
         CACHE = CacheBuilder.newBuilder().expireAfterAccess(Duration.ofMinutes(cacheTimer)).build();
         clazz = tClass;
         registryKey = rKey;
@@ -108,7 +108,7 @@ public abstract class PollutionRegistryResolver<T> {
     }
 
     /**
-     * Calls {@link PollutionRegistryResolver#resolve} on the provided object, and fires the {@link PollutionEvent}
+     * Calls {@link TaggedPollutionRegistryResolver#resolve} on the provided object, and fires the {@link PollutionEvent}
      * for its class
      * @param level The level the pollution will be applied to
      * @param obj The object causing the pollution
@@ -122,7 +122,7 @@ public abstract class PollutionRegistryResolver<T> {
     }
 
     /**
-     * Similar to {@link PollutionRegistryResolver#fireEvent(ServerLevel, Object, BlockPos)}, but applies <code>trans</code> before
+     * Similar to {@link TaggedPollutionRegistryResolver#fireEvent(ServerLevel, Object, BlockPos)}, but applies <code>trans</code> before
      * firing the event
      * @param level The level the pollution will be applied to
      * @param obj The object causing the pollution

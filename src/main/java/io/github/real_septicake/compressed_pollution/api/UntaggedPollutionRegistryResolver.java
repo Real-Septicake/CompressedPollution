@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 
 /**
  * The base class for handling object types whose pollution values are managed by datapack registries.
- * The difference between this and {@link PollutionRegistryResolver} is that this class is for objects that do not have tags
+ * The difference between this and {@link TaggedPollutionRegistryResolver} is that this class is for objects that do not have tags
  * @param <T> The type of object handled by the instance
  */
 @Nonnull
@@ -82,7 +82,7 @@ public abstract class UntaggedPollutionRegistryResolver<T> {
     }
 
     /**
-     * Calls {@link PollutionRegistryResolver#resolve} on the provided object, and fires the {@link PollutionEvent}
+     * Calls {@link TaggedPollutionRegistryResolver#resolve} on the provided object, and fires the {@link PollutionEvent}
      * for its class
      * @param level The level the pollution will be applied to
      * @param obj The object causing the pollution
@@ -96,7 +96,7 @@ public abstract class UntaggedPollutionRegistryResolver<T> {
     }
 
     /**
-     * Similar to {@link PollutionRegistryResolver#fireEvent(ServerLevel, Object, BlockPos)}, but applies <code>trans</code> before
+     * Similar to {@link TaggedPollutionRegistryResolver#fireEvent(ServerLevel, Object, BlockPos)}, but applies <code>trans</code> before
      * firing the event
      * @param level The level the pollution will be applied to
      * @param obj The object causing the pollution

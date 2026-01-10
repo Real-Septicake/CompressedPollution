@@ -38,8 +38,10 @@ class EventBatcher {
                     key.obj,
                     key.level,
                     key.sourcePos
-            )) && !pollution.isEmpty())
+            )) && !pollution.isEmpty()) {
+                CompressedPollution.LOGGER.debug("Pollution applied: {}", pollution);
                 LevelPollution.getFromLevel(key.level).apply(pollution);
+            }
         }
         batches.clear();
         profiler.ifPresent(ProfilerFiller::pop);

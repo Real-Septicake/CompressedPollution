@@ -4,7 +4,6 @@ import io.github.real_septicake.compressed_pollution.CompressedPollution;
 import io.github.real_septicake.compressed_pollution.LongUtil;
 import io.github.real_septicake.compressed_pollution.api.PollutionContainer;
 import mekanism.api.NBTConstants;
-import mekanism.common.content.qio.IQIODriveItem;
 import mekanism.common.content.qio.QIOGlobalItemLookup;
 import mekanism.common.item.ItemQIODrive;
 import mekanism.common.lib.inventory.HashedItem;
@@ -23,7 +22,7 @@ import java.util.UUID;
 
 @Mixin(ItemQIODrive.class)
 @Pseudo
-public abstract class QIODestructionMixin extends Item implements IQIODriveItem, PollutionContainer {
+public abstract class QIODestructionMixin extends Item implements PollutionContainer {
     public QIODestructionMixin(Properties p_41383_) {
         super(p_41383_);
     }

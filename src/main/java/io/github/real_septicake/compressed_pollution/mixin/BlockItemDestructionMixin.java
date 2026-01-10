@@ -29,7 +29,7 @@ public abstract class BlockItemDestructionMixin implements PollutionContainer {
     @Inject(method = "onDestroyed", at = @At("HEAD"))
     private void pollutionTime(ItemEntity item, CallbackInfo ci) {
         if(!item.level().isClientSide) {
-            if(item.getItem().getItem() instanceof PollutionContainer c)
+            if(item.getItem().getItem() instanceof PollutionContainer c && !(this.getBlock() instanceof DropsOnDestroy))
                 c.compressedPollution$handleContents(item.getItem(), (ServerLevel) item.level(), item.getItem().getCount(), item.blockPosition());
             CompressedPollution.ITEM_RESOLVER.fireEvent(
                     (ServerLevel) item.level(), item.getItem().getItem(),
@@ -53,7 +53,7 @@ public abstract class BlockItemDestructionMixin implements PollutionContainer {
 
     @Override
     public void compressedPollution$handleContents(ItemStack self, ServerLevel level, long count, @Nullable BlockPos sourcePos) {
-        if(this.getBlock() instanceof PollutionContainer c && !(this.getBlock() instanceof DropsOnDestroy)) {
+        if(this.getBlock() instanceof PollutionContainer c) {
             c.compressedPollution$handleContents(self, level, count, sourcePos);
         }
     }

@@ -54,7 +54,7 @@ public class AE2CompatHandler {
         var present = handlers.get(clazz);
         if(present != null)
             throw new AlreadyPresentException("Handler for type " + clazz.getSimpleName() + " already exists. Registered by mod \"" + present.getSecond() + "\"");
-        CompressedPollution.LOGGER.debug("Registering handler for {} type by \"{}\"", clazz.getSimpleName(), modId);
+        CompressedPollution.LOGGER.info("Registering handler for {} type by \"{}\"", clazz.getSimpleName(), modId);
         handlers.put(clazz, Pair.of(handler, modId));
     }
 
