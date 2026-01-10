@@ -1,6 +1,6 @@
 package io.github.real_septicake.compressed_pollution.mixin;
 
-import io.github.real_septicake.compressed_pollution.CompressedPollution;
+import io.github.real_septicake.compressed_pollution.BuiltInResolvers;
 import io.github.real_septicake.compressed_pollution.api.DropsOnDestroy;
 import io.github.real_septicake.compressed_pollution.api.PollutionContainer;
 import net.minecraft.core.BlockPos;
@@ -31,7 +31,7 @@ public abstract class BlockItemDestructionMixin implements PollutionContainer {
         if(!item.level().isClientSide) {
             if(item.getItem().getItem() instanceof PollutionContainer c && !(this.getBlock() instanceof DropsOnDestroy))
                 c.compressedPollution$handleContents(item.getItem(), (ServerLevel) item.level(), item.getItem().getCount(), item.blockPosition());
-            CompressedPollution.ITEM_RESOLVER.fireEvent(
+            BuiltInResolvers.getItemResolver().fireEvent(
                     (ServerLevel) item.level(), item.getItem().getItem(),
                     item.blockPosition(), p -> p.multiply(item.getItem().getCount())
             );
@@ -43,7 +43,7 @@ public abstract class BlockItemDestructionMixin implements PollutionContainer {
         if(!ctx.getLevel().isClientSide) {
             FluidState fs = ctx.getLevel().getFluidState(ctx.getClickedPos());
             if (fs.isSource()) {
-                CompressedPollution.FLUID_RESOLVER.fireEvent(
+                BuiltInResolvers.getFluidResolver().fireEvent(
                         (ServerLevel) ctx.getLevel(), fs.getType(),
                         ctx.getClickedPos(), p -> p.multiply(1_000)
                 );

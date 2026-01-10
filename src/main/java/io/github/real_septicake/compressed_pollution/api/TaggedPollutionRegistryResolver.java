@@ -14,12 +14,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraftforge.registries.DataPackRegistryEvent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * The base class for handling object types whose pollution values are managed by datapack registries
@@ -43,6 +46,27 @@ public abstract class TaggedPollutionRegistryResolver<T> {
         clazz = tClass;
         registryKey = rKey;
         profilerEntry = "Pollution" + clazz.getSimpleName();
+    }
+
+    public static <R> TaggedPollutionRegistryResolver<R> create(
+            long cacheTimer, Class<R> clazz,
+            ResourceLocation registryLocation, DataPackRegistryEvent.NewRegistry event,
+            ResourceKey<Registry<R>> tagRegistry, Function<R, ResourceLocation> toRL,
+            BiFunction<R, TagKey<R>, Boolean> isTag
+    ) {
+        ResourceKey<Registry<TaggedPollutionEntry<R>>> key = ResourceKey.createRegistryKey(registryLocation);
+        event.dataPackRegistry(key, TaggedPollutionEntry.codec(tagRegistry));
+        return new TaggedPollutionRegistryResolver<>(cacheTimer, clazz, key) {
+            @Override
+            public ResourceLocation toRL(R obj) {
+                return toRL.apply(obj);
+            }
+
+            @Override
+            public boolean isTag(R obj, TagKey<R> tag) {
+                return isTag.apply(obj, tag);
+            }
+        };
     }
 
     /**

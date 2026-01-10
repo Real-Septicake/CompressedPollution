@@ -1,7 +1,7 @@
 package io.github.real_septicake.compressed_pollution.mixin;
 
-import io.github.real_septicake.compressed_pollution.CompressedPollution;
 import io.github.real_septicake.compressed_pollution.LongUtil;
+import io.github.real_septicake.compressed_pollution.BuiltInResolvers;
 import io.github.real_septicake.compressed_pollution.api.PollutionContainer;
 import mekanism.api.NBTConstants;
 import mekanism.common.content.qio.QIOGlobalItemLookup;
@@ -58,7 +58,7 @@ public abstract class QIODestructionMixin extends Item implements PollutionConta
                     if(type.getItem() instanceof PollutionContainer c) { // fuck
                         c.compressedPollution$handleContents(type.getInternalStack().copy(), level, LongUtil.safeMult(amt, count), sourcePos);
                     }
-                    CompressedPollution.ITEM_RESOLVER.fireEvent(
+                    BuiltInResolvers.getItemResolver().fireEvent(
                             level, type.getItem(), sourcePos,
                             p -> p.multiply(LongUtil.safeMult(amt, count))
                     );

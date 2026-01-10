@@ -3,7 +3,7 @@ package io.github.real_septicake.compressed_pollution.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import flaxbeard.immersivepetroleum.common.blocks.tileentities.FlarestackTileEntity;
 import flaxbeard.immersivepetroleum.common.blocks.tileentities.IPTileEntityBase;
-import io.github.real_septicake.compressed_pollution.CompressedPollution;
+import io.github.real_septicake.compressed_pollution.BuiltInResolvers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -25,7 +25,7 @@ public abstract class FlareFluidDestructionMixin extends IPTileEntityBase {
     @Inject(method = "tickServer", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fluids/capability/templates/FluidTank;drain(ILnet/minecraftforge/fluids/capability/IFluidHandler$FluidAction;)Lnet/minecraftforge/fluids/FluidStack;", ordinal = 1, shift = At.Shift.AFTER), remap = false)
     private void pollutionTime(CallbackInfo ci, @Local(name = "fs") FluidStack fs) {
         if(this.level != null && !this.level.isClientSide)
-            CompressedPollution.FLUID_RESOLVER.fireEvent(
+            BuiltInResolvers.getFluidResolver().fireEvent(
                     (ServerLevel) this.level, fs.getFluid(),
                     this.worldPosition, p -> p.multiply(fs.getAmount())
             );

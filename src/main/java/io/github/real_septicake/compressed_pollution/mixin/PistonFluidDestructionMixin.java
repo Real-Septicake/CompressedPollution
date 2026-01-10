@@ -1,7 +1,7 @@
 package io.github.real_septicake.compressed_pollution.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import io.github.real_septicake.compressed_pollution.CompressedPollution;
+import io.github.real_septicake.compressed_pollution.BuiltInResolvers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -23,7 +23,7 @@ public class PistonFluidDestructionMixin extends Block {
     @Inject(method = "moveBlocks", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;gameEvent(Lnet/minecraft/world/level/gameevent/GameEvent;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/gameevent/GameEvent$Context;)V", shift = At.Shift.AFTER))
     private void polluteOnFluidDestroy(Level level, BlockPos pos, Direction dir, boolean extending, CallbackInfoReturnable<Boolean> cir, @Local(name = "blockpos2") BlockPos blockpos2, @Local(name = "blockstate1") BlockState state) {
         if(state.getFluidState().isSource() && !level.isClientSide()) {
-            CompressedPollution.FLUID_RESOLVER.fireEvent(
+            BuiltInResolvers.getFluidResolver().fireEvent(
                     (ServerLevel) level, state.getFluidState().getType(),
                     blockpos2, p -> p.multiply(1_000)
             );

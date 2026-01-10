@@ -1,6 +1,6 @@
 package io.github.real_septicake.compressed_pollution.mixin;
 
-import io.github.real_septicake.compressed_pollution.CompressedPollution;
+import io.github.real_septicake.compressed_pollution.BuiltInResolvers;
 import io.github.real_septicake.compressed_pollution.api.PollutionContainer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -19,7 +19,7 @@ public class EntityDestructionMixin {
             if(ie.getItem().getItem() instanceof PollutionContainer c) {
                 c.compressedPollution$handleContents(ie.getItem(), (ServerLevel) ie.level(), ie.getItem().getCount(), ie.blockPosition());
             }
-            CompressedPollution.ITEM_RESOLVER.fireEvent(
+            BuiltInResolvers.getItemResolver().fireEvent(
                     (ServerLevel) ie.level(), ie.getItem().getItem(),
                     ie.blockPosition(), p -> p.multiply(ie.getItem().getCount())
             );

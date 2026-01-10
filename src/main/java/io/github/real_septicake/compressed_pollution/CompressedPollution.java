@@ -3,20 +3,13 @@ package io.github.real_septicake.compressed_pollution;
 import appeng.api.stacks.AEFluidKey;
 import appeng.api.stacks.AEItemKey;
 import io.github.real_septicake.compressed_pollution.api.PollutionContainer;
-import io.github.real_septicake.compressed_pollution.api.TaggedPollutionRegistryResolver;
 import io.github.real_septicake.compressed_pollution.caps.ILevelPollution;
 import io.github.real_septicake.compressed_pollution.caps.LevelPollutionAttacher;
 import io.github.real_septicake.compressed_pollution.compat.ae2.AE2CompatHandler;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -54,45 +47,6 @@ public class CompressedPollution
 
     private static final EventBatcher BATCHER = new EventBatcher();
 
-    /** Registry key for Item pollution values */
-    public static final ResourceKey<Registry<TaggedPollutionEntry<Item>>> POLLUTION_ITEM_REGISTRY_KEY = ResourceKey.createRegistryKey(id("pollutions/item"));
-    /** Registry key for Fluid pollution values */
-    public static final ResourceKey<Registry<TaggedPollutionEntry<Fluid>>> POLLUTION_FLUID_REGISTRY_KEY = ResourceKey.createRegistryKey(id("pollutions/fluid"));
-
-    /** The resolver for {@link Item}s */
-    public static final TaggedPollutionRegistryResolver<Item> ITEM_RESOLVER = new TaggedPollutionRegistryResolver<>(
-            5L,
-            Item.class,
-            POLLUTION_ITEM_REGISTRY_KEY
-    ) {
-        @Override
-        public ResourceLocation toRL(Item obj) {
-            return ForgeRegistries.ITEMS.getKey(obj.asItem());
-        }
-
-        @Override
-        public boolean isTag(Item obj, TagKey<Item> tag) {
-            return new ItemStack(obj).is(tag);
-        }
-    };
-
-    /** The resolver for {@link Fluid}s */
-    public static final TaggedPollutionRegistryResolver<Fluid> FLUID_RESOLVER = new TaggedPollutionRegistryResolver<>(
-            5L,
-            Fluid.class,
-            POLLUTION_FLUID_REGISTRY_KEY
-    ) {
-        @Override
-        public ResourceLocation toRL(Fluid obj) {
-            return ForgeRegistries.FLUIDS.getKey(obj);
-        }
-
-        @Override
-        public boolean isTag(Fluid obj, TagKey<Fluid> tag) {
-            return obj.is(tag);
-        }
-    };
-
     /**
      * Creates a ResourceLocation with {@link CompressedPollution#MODID} as the namespace
      * @param path The path for the ResourceLocation
@@ -104,11 +58,7 @@ public class CompressedPollution
 
     public CompressedPollution(FMLJavaModLoadingContext context)
     {
-        context.getModEventBus().addListener((DataPackRegistryEvent.NewRegistry evt) -> {
-            evt.dataPackRegistry(POLLUTION_ITEM_REGISTRY_KEY, TaggedPollutionEntry.codec(ForgeRegistries.ITEMS.getRegistryKey()));
-            evt.dataPackRegistry(POLLUTION_FLUID_REGISTRY_KEY, TaggedPollutionEntry.codec(ForgeRegistries.FLUIDS.getRegistryKey()));
-        });
-
+        context.getModEventBus().addListener(BuiltInResolvers::init); // create the resolvers
         MinecraftForge.EVENT_BUS.addGenericListener(Level.class, (AttachCapabilitiesEvent<Level> evt) -> {
             evt.addCapability(
                     LevelPollutionAttacher.ID,
@@ -129,7 +79,7 @@ public class CompressedPollution
                             if(key.getItem() instanceof PollutionContainer c) {
                                 c.compressedPollution$handleContents(key.toStack(), level, amount, sourcePos);
                             }
-                            CompressedPollution.ITEM_RESOLVER.fireEvent(
+                            BuiltInResolvers.getItemResolver().fireEvent(
                                     level, key.getItem(), sourcePos, p -> p.multiply(amount)
                             );
                         },
@@ -138,7 +88,7 @@ public class CompressedPollution
                 AE2CompatHandler.INSTANCE.addHandler(
                         AEFluidKey.class,
                         (key, amount, level, sourcePos) -> {
-                            CompressedPollution.FLUID_RESOLVER.fireEvent(
+                            BuiltInResolvers.getFluidResolver().fireEvent(
                                     level, key.getFluid(), sourcePos, p -> p.multiply(amount)
                             );
                         },

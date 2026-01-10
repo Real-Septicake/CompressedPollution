@@ -13,12 +13,14 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraftforge.registries.DataPackRegistryEvent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * The base class for handling object types whose pollution values are managed by datapack registries.
@@ -43,6 +45,21 @@ public abstract class UntaggedPollutionRegistryResolver<T> {
         this.clazz = clazz;
         this.registryKey = rKey;
         this.profilerEntry = "PollutionUntagged" + clazz.getSimpleName();
+    }
+
+    public static <R> UntaggedPollutionRegistryResolver<R> create(
+            long cacheTimer, Class<R> clazz,
+            ResourceLocation registryLocation, DataPackRegistryEvent.NewRegistry event,
+            Function<R, ResourceLocation> toRL
+    ) {
+        ResourceKey<Registry<UntaggedPollutionEntry>> key = ResourceKey.createRegistryKey(registryLocation);
+        event.dataPackRegistry(key, UntaggedPollutionEntry.CODEC);
+        return new UntaggedPollutionRegistryResolver<>(cacheTimer, clazz, key) {
+            @Override
+            public ResourceLocation toRL(R obj) {
+                return toRL.apply(obj);
+            }
+        };
     }
 
     /**

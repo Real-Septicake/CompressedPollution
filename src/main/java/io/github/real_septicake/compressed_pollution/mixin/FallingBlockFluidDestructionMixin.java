@@ -1,7 +1,7 @@
 package io.github.real_septicake.compressed_pollution.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import io.github.real_septicake.compressed_pollution.CompressedPollution;
+import io.github.real_septicake.compressed_pollution.BuiltInResolvers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -40,7 +40,7 @@ public abstract class FallingBlockFluidDestructionMixin extends Entity {
         if(!level().isClientSide) {
             FluidState fs = level().getFluidState(blockpos);
             if (fs.isSource()) {
-                CompressedPollution.FLUID_RESOLVER.fireEvent(
+                BuiltInResolvers.getFluidResolver().fireEvent(
                         (ServerLevel) level(), fs.getType(),
                         blockpos, p -> p.multiply(1_000)
                 );
