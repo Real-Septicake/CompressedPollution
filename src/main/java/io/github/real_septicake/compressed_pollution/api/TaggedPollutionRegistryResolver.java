@@ -48,6 +48,18 @@ public abstract class TaggedPollutionRegistryResolver<T> {
         profilerEntry = "Pollution" + clazz.getSimpleName();
     }
 
+    /**
+     * Creates a resolver based on the provided arguments
+     * @param cacheTimer The number of minutes the entries should remain in the cache
+     * @param clazz The class to fire the {@link PollutionEvent} for
+     * @param registryLocation The location to place the registry at
+     * @param event The {@link net.minecraftforge.registries.DataPackRegistryEvent.NewRegistry NewRegistry} event to use to create the registry
+     * @param tagRegistry The registry to use for parsing the tags
+     * @param toRL The function to use to convert the object into its {@link ResourceLocation}
+     * @param isTag The function to use to check if a given tag applies to the provided object
+     * @return The resolver created from the provided arguments
+     * @param <R> The type of object to resolve for
+     */
     public static <R> TaggedPollutionRegistryResolver<R> create(
             long cacheTimer, Class<R> clazz,
             ResourceLocation registryLocation, DataPackRegistryEvent.NewRegistry event,
@@ -159,5 +171,9 @@ public abstract class TaggedPollutionRegistryResolver<T> {
         CompressedPollution.handlePollution(
                 p, level, obj, clazz, sourcePos
         );
+    }
+
+    public final ResourceKey<Registry<TaggedPollutionEntry<T>>> getRegistryKey() {
+        return registryKey;
     }
 }

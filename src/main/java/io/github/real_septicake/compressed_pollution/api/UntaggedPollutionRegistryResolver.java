@@ -47,6 +47,16 @@ public abstract class UntaggedPollutionRegistryResolver<T> {
         this.profilerEntry = "PollutionUntagged" + clazz.getSimpleName();
     }
 
+    /**
+     * Creates a resolver based on the provided arguments
+     * @param cacheTimer The number of minutes the entries should remain in the cache
+     * @param clazz The class to fire the {@link PollutionEvent} for
+     * @param registryLocation The location to place the registry at
+     * @param event The {@link net.minecraftforge.registries.DataPackRegistryEvent.NewRegistry NewRegistry} event to use to create the registry
+     * @param toRL The function to use to convert the object into its {@link ResourceLocation}
+     * @return The resolver created from the provided arguments
+     * @param <R> The type of object to resolve for
+     */
     public static <R> UntaggedPollutionRegistryResolver<R> create(
             long cacheTimer, Class<R> clazz,
             ResourceLocation registryLocation, DataPackRegistryEvent.NewRegistry event,
@@ -126,5 +136,9 @@ public abstract class UntaggedPollutionRegistryResolver<T> {
         CompressedPollution.handlePollution(
                 p, level, obj, clazz, sourcePos
         );
+    }
+
+    public final ResourceKey<Registry<UntaggedPollutionEntry>> getRegistryKey() {
+        return registryKey;
     }
 }
