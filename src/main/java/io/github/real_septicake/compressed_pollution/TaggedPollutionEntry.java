@@ -36,13 +36,13 @@ public record TaggedPollutionEntry<T>(Map<ResourceLocation, Long> values, List<P
                                                 Codec.LONG.fieldOf("value").forGetter(PollutionTag::value)
                                         ).apply(tag, tag.stable(PollutionTag<R>::new))
                                 )
-                        ).optionalFieldOf("tags", new ArrayList<>()).forGetter(it -> it.tags)
+                        ).optionalFieldOf("tags", List.of()).forGetter(it -> it.tags)
                 ).apply(instance, instance.stable(TaggedPollutionEntry::new))
         );
     }
 
     /**
-     * Java representation of the objects under the "tags" key in the json file
+     * Java representation of the objects under the "tags" key in the JSON file
      * @param tag The tag the value is for
      * @param value The amount of this pollution to produce
      * @param <T> The type of object represented e.g. Item or Fluid

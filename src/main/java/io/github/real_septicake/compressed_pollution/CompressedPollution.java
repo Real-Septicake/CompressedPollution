@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -109,7 +110,7 @@ public class CompressedPollution
      * @param sourcePos The position of the object causing the pollution, or null if no appropriate position exists
      * @param <T> The class to post the PollutionEvent to
      */
-    public static <T> void handlePollution(@Nonnull Pollution pollution, @Nonnull ServerLevel level, T obj, Class<T> clazz, BlockPos sourcePos) {
+    public static <T> void handlePollution(@Nonnull Pollution pollution, @Nonnull ServerLevel level, T obj, Class<T> clazz, @Nullable BlockPos sourcePos) {
         BATCHER.add(level, clazz, obj, sourcePos, pollution);
     }
 }
