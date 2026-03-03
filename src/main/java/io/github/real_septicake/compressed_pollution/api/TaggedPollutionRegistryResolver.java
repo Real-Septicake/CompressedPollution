@@ -103,16 +103,17 @@ public abstract class TaggedPollutionRegistryResolver<T> {
      * @param profiler Optional profiler for debugging
      * @return The pollution values for the object
      */
-    public final Pollution resolve(RegistryAccess access, T obj, Optional<ProfilerFiller> profiler) {
-        profiler.ifPresent(p -> p.push(profilerEntry));
+    public final Pollution resolve(RegistryAccess access, T obj, ProfilerFiller profiler) {
+        profiler.push(profilerEntry);
         ResourceLocation loc = toRL(obj);
         if (loc == null) {
-            profiler.ifPresent(ProfilerFiller::pop);
+            profiler.pop();
+            CompressedPollution.LOGGER.warn("Object \"%{}\" unable to be converted to Resource Location", obj);
             return Pollution.PollutionBuilder.EMPTY.copy();
         }
         Pollution cached = CACHE.getIfPresent(loc);
         if (cached != null) {
-            profiler.ifPresent(ProfilerFiller::pop);
+            profiler.pop();
             return cached.copy();
         }
         Pollution.PollutionBuilder builder = new Pollution.PollutionBuilder();
@@ -120,7 +121,7 @@ public abstract class TaggedPollutionRegistryResolver<T> {
                 entry -> {
                     Long value = entry.getValue().values().getOrDefault(loc, null);
                     if(value == null) {
-                        profiler.ifPresent(p -> p.push(profilerEntry + "Tag"));
+                        profiler.push(profilerEntry + "Tag");
                         TaggedPollutionEntry.PollutionTag<T> tag = null;
                         for(TaggedPollutionEntry.PollutionTag<T> t : entry.getValue().tags()) {
                             if(isTag(obj, t.tag())) {
@@ -130,14 +131,14 @@ public abstract class TaggedPollutionRegistryResolver<T> {
                         }
                         if(tag != null)
                             value = tag.value();
-                        profiler.ifPresent(ProfilerFiller::pop);
+                        profiler.pop();
                     }
                     if(value == null)
                         return;
                     builder.put(entry.getKey().location().toString(), value);
                 }
         );
-        profiler.ifPresent(ProfilerFiller::pop);
+        profiler.pop();
         Pollution created = builder.build();
         CACHE.put(loc, created.copy());
         return created;
@@ -152,7 +153,7 @@ public abstract class TaggedPollutionRegistryResolver<T> {
      */
     public final void fireEvent(ServerLevel level, T obj, @Nullable BlockPos sourcePos) {
         CompressedPollution.handlePollution(
-                resolve(level.registryAccess(), obj, Optional.of(level.getProfiler())),
+                resolve(level.registryAccess(), obj, level.getProfiler()),
                 level, obj, clazz, sourcePos
         );
     }
@@ -166,7 +167,7 @@ public abstract class TaggedPollutionRegistryResolver<T> {
      * @param trans The {@link Pollution} transformer to be applied
      */
     public final void fireEvent(ServerLevel level, T obj, @Nullable BlockPos sourcePos, Consumer<Pollution> trans) {
-        Pollution p = resolve(level.registryAccess(), obj, Optional.of(level.getProfiler()));
+        Pollution p = resolve(level.registryAccess(), obj, level.getProfiler());
         trans.accept(p);
         CompressedPollution.handlePollution(
                 p, level, obj, clazz, sourcePos

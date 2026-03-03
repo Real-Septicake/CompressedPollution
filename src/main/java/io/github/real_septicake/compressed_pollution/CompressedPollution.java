@@ -16,6 +16,7 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -59,7 +60,7 @@ public class CompressedPollution
 
     public CompressedPollution(FMLJavaModLoadingContext context)
     {
-        context.getModEventBus().addListener(BuiltInResolvers::init); // create the resolvers
+        context.getModEventBus().addListener(EventPriority.HIGH, BuiltInResolvers::init); // create the resolvers
         MinecraftForge.EVENT_BUS.addGenericListener(Level.class, (AttachCapabilitiesEvent<Level> evt) -> {
             evt.addCapability(
                     LevelPollutionAttacher.ID,
@@ -69,7 +70,7 @@ public class CompressedPollution
 
         MinecraftForge.EVENT_BUS.addListener((TickEvent.ServerTickEvent evt) -> {
             if(evt.phase == TickEvent.Phase.END)
-                BATCHER.dispatch(Optional.of(evt.getServer().getProfiler()));
+                BATCHER.dispatch(evt.getServer().getProfiler());
         });
 
         if(ModList.get().isLoaded("ae2")) {

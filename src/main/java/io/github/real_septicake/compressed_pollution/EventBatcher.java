@@ -9,7 +9,6 @@ import net.minecraftforge.common.MinecraftForge;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 class EventBatcher {
     private final HashMap<BatchKey<?>, Pollution> batches = new HashMap<>();
@@ -19,16 +18,15 @@ class EventBatcher {
     public <T> void add(ServerLevel level, Class<T> clazz, T obj, @Nullable BlockPos sourcePos, Pollution pollution) {
         BatchKey<T> key = new BatchKey<>(level, clazz, obj, sourcePos);
         Pollution p = batches.get(key);
-        if(p == null) {
+        if(p == null)
             batches.put(key, pollution);
-        } else {
+        else
             batches.put(key, p.merge(pollution));
-        }
     }
 
     @SuppressWarnings("unchecked") // it's probably fine?
-    public void dispatch(Optional<ProfilerFiller> profiler) {
-        profiler.ifPresent(p -> p.push("PollutionApplication"));
+    public void dispatch(ProfilerFiller profiler) {
+        profiler.push("PollutionApplication");
         for(Map.Entry<BatchKey<?>, Pollution> entry : batches.entrySet()) {
             BatchKey<Object> key = (BatchKey<Object>) entry.getKey();
             Pollution pollution = entry.getValue();
@@ -39,11 +37,11 @@ class EventBatcher {
                     key.level,
                     key.sourcePos
             )) && !pollution.isEmpty()) {
-                CompressedPollution.LOGGER.debug("Pollution applied: {}", pollution);
+                CompressedPollution.LOGGER.debug("Applying pollution ${} to ${}", pollution, key.level);
                 LevelPollution.getFromLevel(key.level).apply(pollution);
             }
         }
         batches.clear();
-        profiler.ifPresent(ProfilerFiller::pop);
+        profiler.pop();
     }
 }

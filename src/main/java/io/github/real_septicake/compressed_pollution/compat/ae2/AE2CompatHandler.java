@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Compatibility layer for AE2 drives
  * <p>
- * Make sure to check that AE2 is loaded before using
+ * Make sure to check that AE2 is loaded before using anything in this class
  */
 public class AE2CompatHandler {
     /**
@@ -51,11 +51,10 @@ public class AE2CompatHandler {
      * @throws AlreadyPresentException If there is already a handler present for that key type
      */
     public <T extends AEKey> void addHandler(Class<T> clazz, KeyHandler<T> handler, String modId) throws AlreadyPresentException {
-        var present = handlers.get(clazz);
-        if(present != null)
+        Pair<KeyHandler<? extends AEKey>, String> present;
+        if((present = handlers.putIfAbsent(clazz, Pair.of(handler, modId))) != null)
             throw new AlreadyPresentException("Handler for type " + clazz.getSimpleName() + " already exists. Registered by mod \"" + present.getSecond() + "\"");
         CompressedPollution.LOGGER.info("Registering handler for {} type by \"{}\"", clazz.getSimpleName(), modId);
-        handlers.put(clazz, Pair.of(handler, modId));
     }
 
     /**

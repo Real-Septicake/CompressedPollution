@@ -129,6 +129,10 @@ public record Pollution(@Nonnull Map<String, Long> values) {
     }
 
     public Pollution merge(Pollution pollution) {
+        if(pollution.isEmpty())
+            return this;
+        if(this.isEmpty())
+            return pollution;
         for (String key : pollution.values.keySet()) {
             add(key, pollution.values.get(key));
         }
