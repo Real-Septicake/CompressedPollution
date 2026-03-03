@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Optional;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(CompressedPollution.MODID)

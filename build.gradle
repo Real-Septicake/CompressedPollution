@@ -177,7 +177,6 @@ dependencies {
         compileOnly "appeng:appliedenergistics2-forge:15.4.9"
         compileOnly "curse.maven:packages-383733:7370945"
         compileOnly "curse.maven:immersive-petroleum-268250:7191176"
-//        compileOnly "curse.maven:immersive-engineering-231951:6206989"
         compileOnly "curse.maven:sophisticated-backpacks-422301:7116643"
         compileOnly "curse.maven:sophisticated-core-618298:7077001"
         compileOnly "mekanism:Mekanism:1.20.1-10.4.16.80"
