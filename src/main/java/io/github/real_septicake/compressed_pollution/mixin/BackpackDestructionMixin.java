@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.BackpackWrapper;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
@@ -32,7 +33,18 @@ public abstract class BackpackDestructionMixin extends ItemBase implements Pollu
 
     @Override
     public void compressedPollution$handleContents(ItemStack self, ServerLevel level, long count, @Nullable BlockPos sourcePos) {
-        InventoryHandler handler = new BackpackWrapper(self).getInventoryHandler();
+        BackpackWrapper wrapper = new BackpackWrapper(self);
+        wrapper.getUpgradeHandler().getSlotWrappers();
+        wrapper.getFluidHandler().ifPresent(h -> {
+            int tanks = h.getTanks();
+            for(int i = 0; i < tanks; i++) {
+                FluidStack stack = h.getFluidInTank(i);
+                BuiltInResolvers.getFluidResolver().fireEvent(
+                        level, stack.getFluid(), sourcePos, p -> p.multiply(LongUtil.safeMult(count, stack.getAmount()))
+                );
+            }
+        });
+        InventoryHandler handler = wrapper.getInventoryHandler();
         for(int i = 0; i < handler.getSlots(); i++) {
             ItemStack stack = handler.getStackInSlot(i);
             if(!stack.isEmpty()) {
