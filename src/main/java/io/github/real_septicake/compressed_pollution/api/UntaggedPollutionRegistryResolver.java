@@ -90,7 +90,7 @@ public abstract class UntaggedPollutionRegistryResolver<T> {
         ResourceLocation loc = toRL(obj);
         if(loc == null) {
             profiler.pop();
-            CompressedPollution.LOGGER.warn("Object \"%{}\" unable to be converted to Resource Location", obj);
+            CompressedPollution.LOGGER.warn("Object \"{}\" unable to be converted to Resource Location", obj);
             return Pollution.PollutionBuilder.EMPTY.copy();
         }
         Pollution cached = CACHE.getIfPresent(loc);

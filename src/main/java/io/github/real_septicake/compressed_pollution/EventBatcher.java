@@ -37,7 +37,7 @@ class EventBatcher {
                     key.level,
                     key.sourcePos
             )) && !pollution.isEmpty()) {
-                CompressedPollution.LOGGER.debug("Applying pollution ${} to ${}", pollution, key.level);
+                CompressedPollution.LOGGER.debug("Applying pollution {} to {}", pollution, key.level);
                 LevelPollution.getFromLevel(key.level).apply(pollution);
             }
         }
