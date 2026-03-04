@@ -265,7 +265,7 @@ def changelogGet() {
 }
 
 publishMods {
-    displayName = "v${project.version}"
+    displayName = "v${mod_version}"
     type = STABLE
     changelog = provider { changelogGet() }
 
