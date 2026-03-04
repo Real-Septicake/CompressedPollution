@@ -34,7 +34,7 @@
     - Probably not, despite being a public API, this is first and foremost made for the [Compression](https://www.curseforge.com/minecraft/modpacks/compression) modpack and its dev team
     and aims to handle mods present within that pack. As much as I would like to support any and every mod possible, that is simply not going to happen,
     and as such the focus will remain on what the pack requires
-  - "Why aren't you handling X way of destroying things in mod Y?"
+  - "Why aren't you handling X way of destroying things in Y mod?"
     - Two possibilities, either it's not really possible with the info available where that happens in the mod's code, as most of this is done
     via mixin tomfoolery, or it's just not necessary for Compression. Feel free to handle it in your own code though, nothing stopping you there
 - Extensible "registry resolvers"

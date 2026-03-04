@@ -85,6 +85,8 @@ parameter, which is a function that gets called on the resolved pollution object
 This is mostly useful for objects that can appear in groups that get destroyed all at once, such as items in stacks, or
 fluids being dealt with by the millibucket.
 
+**For using these custom registries, view [extending.md](./extending.md)**
+
 ## Data Generation
 
 Data generation for the registries created by the resolver `create()` methods are roughly the same as what would be done
