@@ -269,6 +269,8 @@ publishMods {
     displayName = "v${mod_version}"
     type = STABLE
     changelog = provider { changelogGet() }
+    modLoaders.add("forge")
+    file = tasks.jarJar.archiveFile
 
     var isCI = !(System.getenv("CI") ?: "").isEmpty()
     var isDryRun = !(System.getenv("DRY_RUN") ?: "").isEmpty()
