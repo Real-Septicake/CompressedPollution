@@ -21,7 +21,7 @@ public class PistonFluidDestructionMixin extends Block {
     }
 
     @Inject(method = "moveBlocks", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;gameEvent(Lnet/minecraft/world/level/gameevent/GameEvent;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/gameevent/GameEvent$Context;)V", shift = At.Shift.AFTER))
-    private void polluteOnFluidDestroy(Level level, BlockPos pos, Direction dir, boolean extending, CallbackInfoReturnable<Boolean> cir, @Local(name = "blockpos2") BlockPos blockpos2, @Local(name = "blockstate1") BlockState state) {
+    private void polluteOnFluidDestroy(Level level, BlockPos pos, Direction dir, boolean extending, CallbackInfoReturnable<Boolean> cir, @Local(ordinal = 2) BlockPos blockpos2, @Local(ordinal = 0) BlockState state) {
         if(state.getFluidState().isSource() && !level.isClientSide()) {
             BuiltInResolvers.getFluidResolver().fireEvent(
                     (ServerLevel) level, state.getFluidState().getType(),
