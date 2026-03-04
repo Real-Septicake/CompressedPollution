@@ -36,7 +36,7 @@ public abstract class FallingBlockFluidDestructionMixin extends Entity {
                     )
             )
     )
-    private void onFluidDestroy(CallbackInfo ci, @Local(name = "blockpos") BlockPos blockpos) {
+    private void onFluidDestroy(CallbackInfo ci, @Local(ordinal = 0) BlockPos blockpos) {
         if(!level().isClientSide) {
             FluidState fs = level().getFluidState(blockpos);
             if (fs.isSource()) {
