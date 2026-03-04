@@ -256,18 +256,18 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
-def getChangelog() {
+def changelogGet() {
     var vals = rootProject.file("CHANGELOG.md").readLines()
     do {
         vals.drop(1)
-    } while(!vals.first().startsWith("###"))
-    vals.takeWhile { !it.startsWith("###") }.join("/n").trim()
+    } while(!vals.first().startsWith("## "))
+    vals.takeWhile { !it.startsWith("## ") }.join("/n").trim()
 }
 
 publishMods {
     displayName = "v${project.version}"
     type = STABLE
-    changelog = getChangelog()
+    changelog = provider { changelogGet() }
 
     var isCI = !(System.getenv("CI") ?: "").isEmpty()
     var isDryRun = !(System.getenv("DRY_RUN") ?: "").isEmpty()
@@ -288,7 +288,6 @@ publishMods {
     }
 
     github {
-        parent(rootProject.tasks.named("publishGithub"))
         repository = System.getenv("GITHUB_REPOSITORY") ?: ""
         commitish = System.getenv("GITHUB_SHA") ?: ""
 
