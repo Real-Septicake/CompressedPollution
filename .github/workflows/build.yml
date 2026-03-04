@@ -72,6 +72,8 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - run: mkdir -p run/mods
+
       - name: Create cache key
         run: |
           cat <<END_OF_FILE > dependencies.txt
