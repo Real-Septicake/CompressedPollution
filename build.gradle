@@ -171,7 +171,9 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     implementation "io.github.llamalad7:mixinextras-common:${mixinExtras}"
     annotationProcessor "io.github.llamalad7:mixinextras-common:${mixinExtras}"
-    implementation "io.github.llamalad7:mixinextras-forge:${mixinExtras}"
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixinExtras}")) {
+        jarJar.ranged(it, "[0.5.0,)")
+    }
     annotationProcessor "io.github.llamalad7:mixinextras-forge:${mixinExtras}"
     if(release) {
         compileOnly "appeng:appliedenergistics2-forge:15.4.9"
