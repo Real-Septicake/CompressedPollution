@@ -258,10 +258,11 @@ tasks.withType(JavaCompile).configureEach {
 
 String changelogGet() {
     var vals = rootProject.file("CHANGELOG.md").readLines()
-    do {
-        vals.drop(1)
-    } while(!vals.first().startsWith("## "))
-    return vals.takeWhile { !it.startsWith("## ") }.join("/n").trim()
+    while(!vals.first().startsWith("## ")) {
+        vals = vals.subList(1, vals.size())
+    }
+    vals = vals.drop(1)
+    vals.takeWhile { !it.startsWith("## ") }.join("\n").trim()
 }
 
 publishMods {
