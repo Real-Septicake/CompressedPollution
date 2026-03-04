@@ -256,12 +256,12 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
-def changelogGet() {
+String changelogGet() {
     var vals = rootProject.file("CHANGELOG.md").readLines()
     do {
         vals.drop(1)
     } while(!vals.first().startsWith("## "))
-    vals.takeWhile { !it.startsWith("## ") }.join("/n").trim()
+    return vals.takeWhile { !it.startsWith("## ") }.join("/n").trim()
 }
 
 publishMods {
