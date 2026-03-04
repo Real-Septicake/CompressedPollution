@@ -4,6 +4,7 @@ plugins {
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
     id 'org.spongepowered.mixin' version '0.7.+'
+    id "me.modmuss50.mod-publish-plugin" version "1.1.0"
 }
 
 version = mod_version
@@ -253,4 +254,45 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+def getChangelog() {
+    var vals = rootProject.file("CHANGELOG.md").readLines()
+    do {
+        vals.drop(1)
+    } while(!vals.first().startsWith("###"))
+    vals.takeWhile { !it.startsWith("###") }.join("/n").trim()
+}
+
+publishMods {
+    displayName = "v${project.version}"
+    type = STABLE
+    changelog = getChangelog()
+
+    var isCI = !(System.getenv("CI") ?: "").isEmpty()
+    var isDryRun = !(System.getenv("DRY_RUN") ?: "").isEmpty()
+    dryRun = !isCI || isDryRun
+
+    curseforge {
+        accessToken = System.getenv("CURSEFORGE_TOKEN") ?: ""
+        projectId = curseforgeId
+        minecraftVersions.add(minecraft_version)
+        clientRequired = false
+        serverRequired = true
+    }
+
+    modrinth {
+        accessToken = System.getenv("MODRINTH_TOKEN") ?: ""
+        projectId = modrinthId
+        minecraftVersions.add(minecraft_version)
+    }
+
+    github {
+        parent(rootProject.tasks.named("publishGithub"))
+        repository = System.getenv("GITHUB_REPOSITORY") ?: ""
+        commitish = System.getenv("GITHUB_SHA") ?: ""
+
+        accessToken = System.getenv("GITHUB_TOKEN") ?: ""
+        allowEmptyFiles = true
+    }
 }
