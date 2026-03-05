@@ -258,9 +258,7 @@ tasks.withType(JavaCompile).configureEach {
 
 String changelogGet() {
     var vals = rootProject.file("CHANGELOG.md").readLines()
-    while(!vals.first().startsWith("## ")) {
-        vals = vals.subList(1, vals.size())
-    }
+    while(!vals.first().startsWith("## ")) { vals = vals.drop(1) }
     vals = vals.drop(1)
     vals.takeWhile { !it.startsWith("## ") }.join("\n").trim()
 }

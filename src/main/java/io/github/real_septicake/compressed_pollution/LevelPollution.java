@@ -23,6 +23,48 @@ public class LevelPollution {
     }
 
     /**
+     * Gets the current value of the pollutant specified by the key
+     * @param key The pollutant to get the value of
+     * @return The current value of the pollutant
+     */
+    public Long getPollutant(String key) {
+        return pollutants.getOrDefault(key, 0L);
+    }
+
+    /**
+     * Sets the value of the pollutant specified by the key, or removes it if setting to 0
+     * @param key The pollutant to set the value of
+     * @param value The value to set the pollutant to
+     */
+    public void setPollutant(String key, Long value) {
+        if(value == 0L)
+            pollutants.remove(key);
+        else
+            pollutants.put(key, value);
+    }
+
+    /**
+     * Adds a value to the pollutant specified by the key, clamping the resulting value to within the values of a long
+     * while avoiding overflows.
+     * @param key The pollutant to add the value to
+     * @param value The amount to add to the pollutant
+     */
+    public void addPollutant(String key, Long value) {
+        if(value == 0L) // Nothing to apply
+            return;
+        long current = pollutants.getOrDefault(key, 0L);
+        if(current == 0L) { // Can't overflow
+            pollutants.put(key, value);
+            return;
+        }
+        long v = LongUtil.safeAdd(current, value);
+        if(v != 0)
+            pollutants.put(key, v);
+        else
+            pollutants.remove(key);
+    }
+
+    /**
      * Applies the provided {@link Pollution} to this <code>LevelPollution</code>.
      * <p>
      * For each pollution type in the provided <code>Pollution</code>, its value is added to the current value
@@ -32,19 +74,8 @@ public class LevelPollution {
      */
     public void apply(@Nonnull Pollution pollution) {
         for(String key : pollution.values().keySet()) {
-            long current = pollutants.getOrDefault(key, 0L);
             long applying = pollution.values().get(key);
-            if(applying == 0L) // Nothing to apply
-                continue;
-            if(current == 0L) { // Can't overflow
-                pollutants.put(key, applying);
-                continue;
-            }
-            long v = LongUtil.safeAdd(current, applying);
-            if(v != 0)
-                pollutants.put(key, v);
-            else
-                pollutants.remove(key);
+            addPollutant(key, applying);
         }
     }
 
