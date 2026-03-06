@@ -101,6 +101,8 @@ so references to an `X_REGISTRY_KEY` can be replaced with the `getRegistryKey()`
 
 ## Events
 
+### Catching
+
 There is a single event provided by this api, that being [`PollutionEvent`](../src/main/java/io/github/real_septicake/compressed_pollution/events/PollutionEvent.java).
 This is a generic fired whenever pollution is about to be applied to a `Level` that can be filtered to when a specific
 class "type" causes it, e.g. a stack of items being dropped in lava fires a `PollutionEvent` for `Item.class`, a fluid
@@ -121,8 +123,20 @@ modified, canceled outright, or simply left alone.
 There are two main ways to fire off this event. The first was mentioned previously, being the `fireEvent()` methods on the
 resolver classes, which creates the event based on the arguments passed to it as well as the data of the resolver itself.
 
-The second, which `fireEvent()` is backed by, is `CompressedPollution#handlePollution()`, which is a more direct and way
+The second, which `fireEvent()` is backed by, is `CompressedPollution#handlePollution()`, which is a more direct way
 of causing the event, allowing explicit assignment of each value in the event. This static function passes off
 the parameters to the event batcher, which deduplicates and merges pollution objects that would cause the same event to
 be fired. The events themselves are dispatched at the end of the server's tick, to be passed onto the handlers to cause
 whatever changes or cancellations they end up doing.
+
+## Level Pollution
+
+There's been a *lot* of talk pollution thus far, more specifically how to create it. But that does leave the question,
+how do you interact with this pollution once it's been created?
+
+`LevelPollution` objects are attached to levels, and are where the pollution from the events gets put after they've
+passed through the handlers. Obtaining the object for a level is done via the `getFromLevel()` static function in the
+same class, providing the level you want to get the pollution levels for as the argument. The values of different
+pollutants can be queried through `getPollutant()` and modified via `setPollutant()` and `addPollutant()`. Do note
+that the functions that modify the pollutant values *do not* trigger event handlers, they get applied as-is without
+allowing for any modification before-hand.

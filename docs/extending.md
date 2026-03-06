@@ -3,6 +3,8 @@
 The content here assumes you have read the custom resolvers section of [how_to.md](how_to.md#custom-registries-and-resolvers)
 and have a passing knowledge of writing mixins.
 
+**This document is incomplete and not extensive, I'm trying my best to make this make sense**
+
 ## Adding destruction methods
 
 The general idea of how to add a new cause of pollution is as simple as a single mixin, throw it in where it will be
