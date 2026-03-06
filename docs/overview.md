@@ -51,4 +51,5 @@
 ## What is _not_ provided:
 
 - Plug-&-Play solutions
-  - This API is a tool, not an answer. The burden of work to make it do anything falls squarely on you
+  - This API is a tool, not an answer. The burden of work to make it do anything falls squarely on you.
+    The numbers go up in the background but that means nothing if they are not used.
