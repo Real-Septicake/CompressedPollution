@@ -16,4 +16,4 @@ The docs directory contains information on this api
   are structured. This should be where you start when looking into it.
 - [extending.md](./docs/extending.md) covers adding new ways for pollution to be caused.
 
-[^1]Just using it is as simple as reading the datapack documentation, extending it would likely require knowledge of mixins
+[^1]: Just using it is as simple as reading the datapack documentation, extending it would likely require knowledge of mixins
